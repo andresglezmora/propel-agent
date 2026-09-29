@@ -1,0 +1,29 @@
+{
+  "cover": {
+    "page": 1,
+    "sourceFile": "img_934.png",
+    "placedW": 981.5,
+    "placedH": 625.78,
+    "minNativeLongSidePx": 1200,
+    "orientation": "landscape",
+    "notes": "La foto más visible del documento. Se estira a 981x626 css px (147% de su resolución nativa 549x350 en el PDF original -> pixelada). Va detrás de la máscara diagonal morada de la portada (shape z-index superior)."
+  },
+  "mission": {
+    "page": 2,
+    "sourceFile": "img_968.png",
+    "placedW": 627.3,
+    "placedH": 436.22,
+    "minNativeLongSidePx": 800,
+    "orientation": "landscape",
+    "notes": "Docente con alumnos, columna derecha de 'Our Mission'."
+  },
+  "testimonials": {
+    "page": 13,
+    "sourceFile": "img_1571.png",
+    "placedW": 627.0,
+    "placedH": 326.82,
+    "minNativeLongSidePx": 800,
+    "orientation": "landscape",
+    "notes": "Franja inferior de la sección de testimonios."
+  }
+}

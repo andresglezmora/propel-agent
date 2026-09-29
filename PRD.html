@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propel PRD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:            #ffffff;
+    --bg-subtle:     #fafafa;
+    --bg-inset:      #f4f4f5;
+    --border:        #eaeaea;
+    --border-strong: #d4d4d4;
+    --fg:            #0a0a0a;
+    --fg-muted:      #666666;
+    --fg-subtle:     #8f8f8f;
+    --accent:        #0a0a0a;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.04);
+    --radius: 8px;
+    --maxw: 760px;
+    --font: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg:#0a0a0a; --bg-subtle:#111111; --bg-inset:#161616;
+      --border:#242424; --border-strong:#343434;
+      --fg:#ededed; --fg-muted:#a1a1a1; --fg-subtle:#7a7a7a; --accent:#ededed;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0a0a0a; --bg-subtle:#111111; --bg-inset:#161616;
+    --border:#242424; --border-strong:#343434;
+    --fg:#ededed; --fg-muted:#a1a1a1; --fg-subtle:#7a7a7a; --accent:#ededed;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px 120px; }
+
+  /* ── Header ─────────────────────────────────────────── */
+  header.doc {
+    border-bottom: 1px solid var(--border);
+    padding: 72px 0 40px;
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--fg-subtle); margin: 0 0 16px;
+  }
+  h1 {
+    font-size: clamp(32px, 6vw, 44px); font-weight: 800;
+    letter-spacing: -0.035em; line-height: 1.1; margin: 0 0 16px;
+  }
+  .lede { font-size: 18px; color: var(--fg-muted); margin: 0 0 28px; max-width: 60ch; }
+  /* Metadatos en texto plano. Encapsularlos no los jerarquiza, solo los disfraza. */
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px;
+    font-size: 13px; color: var(--fg-muted); margin: 0; }
+  .meta .sep { color: var(--border-strong); }
+  .meta .status { display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 600; color: var(--fg); }
+  .meta .status .dot { width: 6px; height: 6px; border-radius: 50%;
+    background: var(--fg); }
+  /* .pill: SOLO para estado que cambia (aprobado/en revisión), nunca decorativa. */
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; padding: 3px 9px;
+    border: 1px solid var(--border); border-radius: 999px;
+    color: var(--fg-muted); background: var(--bg-subtle);
+  }
+
+  /* ── Table of contents ──────────────────────────────── */
+  nav.toc {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--bg-subtle); padding: 20px 22px; margin: 0 0 56px;
+  }
+  nav.toc p { margin: 0 0 12px; font-size: 12px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--fg-subtle); }
+  nav.toc ol { margin: 0; padding: 0; list-style: none; counter-reset: toc;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2px 24px; }
+  nav.toc li { counter-increment: toc; }
+  nav.toc a {
+    display: block; padding: 5px 0; color: var(--fg-muted);
+    text-decoration: none; font-size: 14px; font-weight: 500;
+  }
+  nav.toc a::before { content: counter(toc) "."; color: var(--fg-subtle);
+    display: inline-block; width: 22px; font-variant-numeric: tabular-nums; }
+  nav.toc a:hover { color: var(--fg); }
+
+  /* ── Sections ───────────────────────────────────────── */
+  section { margin: 0 0 64px; scroll-margin-top: 24px; }
+  h2 {
+    font-size: 24px; font-weight: 700; letter-spacing: -0.025em;
+    margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 17px; font-weight: 700; letter-spacing: -0.015em; margin: 32px 0 10px; }
+  h4 { font-size: 15px; font-weight: 700; margin: 24px 0 8px; color: var(--fg-muted); }
+  p { margin: 0 0 16px; }
+  a { color: var(--fg); text-decoration: underline; text-underline-offset: 2px;
+      text-decoration-color: var(--border-strong); }
+  a:hover { text-decoration-color: var(--fg); }
+  strong { font-weight: 700; }
+  ul, ol { margin: 0 0 16px; padding-left: 22px; }
+  li { margin: 0 0 8px; }
+  li::marker { color: var(--fg-subtle); }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  /* ── Blocks ─────────────────────────────────────────── */
+  blockquote {
+    margin: 0 0 20px; padding: 16px 20px;
+    border-left: 2px solid var(--fg); background: var(--bg-subtle);
+    border-radius: 0 var(--radius) var(--radius) 0; color: var(--fg-muted);
+  }
+  blockquote p:last-child { margin: 0; }
+
+  .callout {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--bg-subtle); padding: 16px 18px; margin: 0 0 20px;
+  }
+  .callout .label {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--fg-subtle); display: block; margin-bottom: 6px;
+  }
+  .callout p:last-child { margin: 0; }
+
+  code {
+    font-family: var(--mono); font-size: .875em;
+    background: var(--bg-inset); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 5px;
+  }
+  pre {
+    font-family: var(--mono); font-size: 13px; line-height: 1.6;
+    background: var(--bg-subtle); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; margin: 0 0 20px;
+    overflow-x: auto; color: var(--fg-muted);
+  }
+  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+  /* ── Tables ─────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin: 0 0 20px;
+    border: 1px solid var(--border); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left; font-weight: 600; font-size: 12px; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--fg-subtle);
+    background: var(--bg-subtle); padding: 10px 16px;
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+
+  /* ── Scope grid (dentro / fuera) ────────────────────── */
+  .grid { display: grid; gap: 16px; margin: 0 0 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; background: var(--bg);
+  }
+  .card h3 { margin: 0 0 12px; font-size: 14px; }
+  .card ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--fg-muted); }
+
+  footer.doc {
+    border-top: 1px solid var(--border); padding-top: 24px; margin-top: 72px;
+    font-size: 13px; color: var(--fg-subtle);
+  }
+
+  @media (max-width: 640px) {
+    header.doc { padding-top: 48px; }
+    nav.toc ol { grid-template-columns: 1fr; }
+  }
+  @media print {
+    :root { --bg:#fff; --fg:#000; }
+    nav.toc { break-inside: avoid; }
+    section { break-inside: auto; }
+    h2 { break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <p class="eyebrow">PRD · Agente eve · TrustED Solutions</p>
+  <h1>Propel</h1>
+  <p class="lede">Un agente que recibe el nombre y el sitio web de una escuela y devuelve, en minutos, la propuesta Full-Service de TrustED en PDF. Mismo contenido y mismo diseño que la plantilla de Canva. Solo cambian el nombre, la fecha, tres fotos y, si la escuela tiene un solo campus, las frases que hablan de red.</p>
+  <p class="meta">
+    <span class="status"><span class="dot"></span>Aprobado para construir</span>
+    <span class="sep">·</span> 28 de septiembre de 2026
+    <span class="sep">·</span> TrustED Solutions
+  </p>
+</header>
+
+<nav class="toc">
+  <p>Contenido</p>
+  <ol>
+    <li><a href="#s1">Problema y objetivo</a></li>
+    <li><a href="#s2">Anatomía de la plantilla</a></li>
+    <li><a href="#s3">Alcance</a></li>
+    <li><a href="#s4">Stack</a></li>
+    <li><a href="#s5">Plantilla y render del PDF</a></li>
+    <li><a href="#s6">Diseño del agente</a></li>
+    <li><a href="#s7">Fotos</a></li>
+    <li><a href="#s8">Datos: Supabase compartido</a></li>
+    <li><a href="#s9">Tools, canales e integraciones</a></li>
+    <li><a href="#s10">Criterios de aceptación y evals</a></li>
+    <li><a href="#s11">Riesgos y mitigaciones</a></li>
+    <li><a href="#s12">Roadmap</a></li>
+    <li><a href="#s13">Estructura del repo</a></li>
+    <li><a href="#s14">Pendientes</a></li>
+  </ol>
+</nav>
+
+<section id="s1">
+  <h2>1. Problema y objetivo</h2>
+  <p>Cuando un lead ya es cliente potencial, el equipo le manda la propuesta Full-Service. Hoy eso se hace a mano en Canva: duplicar el diseño, reemplazar el nombre de la escuela, buscar fotos en su sitio o generarlas con IA, acomodarlas y exportar a PDF. Cada propuesta cuesta tiempo de una persona y las ediciones a mano dejan errores (en la versión de PROUD Academy hay varios, ver sección 2).</p>
+  <p><strong>Objetivo:</strong> que alguien del equipo escriba en Telegram el nombre, el sitio y si la escuela es de un campus o una red, y reciba el PDF listo para enviar, fiel a la plantilla, sin abrir Canva.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Métrica</th><th>Hoy</th><th>Meta V1</th></tr></thead>
+      <tbody>
+        <tr><td>Tiempo desde la solicitud hasta la vista previa</td><td>Por medir (estimado 30 a 60 min)</td><td>Menos de 5 min</td></tr>
+        <tr><td>Propuestas aprobadas sin cambios manuales</td><td>0 (todas son manuales)</td><td>9 de cada 10</td></tr>
+        <tr><td>Errores de nombre o texto en el PDF</td><td>Varios por propuesta</td><td>0, verificado en código antes de entregar</td></tr>
+        <tr><td>Costo por propuesta</td><td>Horas de diseño</td><td>Menos de US$1 en modelo, scraping e imágenes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s2">
+  <h2>2. Anatomía de la plantilla</h2>
+  <p>Base: <code>Proposal - PROUD Academy.pdf</code>, exportado de Canva. 21 páginas tamaño carta (612 × 792 pt). Se divide en la propuesta (páginas 1 a 13) y el Service Agreement (14 a 21).</p>
+
+  <h3>Qué cambia por escuela</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Variable</th><th>Dónde</th><th>Notas</th></tr></thead>
+      <tbody>
+        <tr><td>Nombre de la escuela</td><td>38 coincidencias en 12 páginas: 1, 2, 3, 4, 10, 11, 15 a 19 y 21</td><td>Algunas son capas duplicadas del mismo título. Se usan variantes del nombre (ver abajo).</td></tr>
+        <tr><td>Fecha</td><td>Portada, "Date:"</td><td>El día en que se genera, en formato <code>September 28, 2026</code>.</td></tr>
+        <tr><td>Modo campus</td><td>Portada y frases de red en el texto</td><td><code>network</code> deja la plantilla como está. <code>single</code> quita "Network-wide" de la portada y usa la versión de un solo campus de cada frase de red.</td></tr>
+        <tr><td>Foto de portada</td><td>Página 1, recorte con forma curva</td><td>La foto más importante del documento: lleva la mejor candidata.</td></tr>
+        <tr><td>Foto "Our Mission"</td><td>Página 2, columna derecha</td><td>Vertical, idealmente docente con alumnos.</td></tr>
+        <tr><td>Foto "Testimonials"</td><td>Página 13, franja inferior</td><td>Horizontal, escena de aula.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Todo lo demás es fijo: la foto de la página 4, las fotos de TrustED de las páginas 6, 8 y 11, las piezas de Aspire de la página 10, las capturas del CRM, la tabla de precios y los testimonios de la página 13 con sus datos de contacto.</p>
+
+  <h3>Variantes del nombre</h3>
+  <p>El reemplazo a mano dejó errores de gramática en la versión de PROUD. Propel guarda estas variantes por escuela y la plantilla usa cada una donde corresponde:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Variante</th><th>Ejemplo</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>PROUD Academy</td><td>Portada, sujeto de las oraciones</td></tr>
+        <tr><td><code>possessive</code></td><td>PROUD Academy's</td><td>"PROUD Academy's central team", "PROUD Academy's IP"</td></tr>
+        <tr><td><code>shortName</code></td><td>PROUD</td><td>Opcional, para frases que se leen largas con el nombre completo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Errores de la plantilla actual</h3>
+  <p>Se corrigen una sola vez al pasar la plantilla a HTML:</p>
+  <ul>
+    <li>Página 1: "Sept 25h, 2026".</li>
+    <li>Página 2: "PROUD Academy gain" (debe ser "gains").</li>
+    <li>Página 3: "PROUD Academy' central team" (posesivo mal formado).</li>
+    <li>Página 5: "$2,500K/mo" (debe ser $2,500/mo) y "Fundrasisng".</li>
+    <li>Página 11: "Every PROUD Academy gets" (quedó de "Every school").</li>
+    <li>Página 15: el párrafo de "Parties &amp; Purpose" está duplicado casi igual.</li>
+    <li>Página 18: "PROUD AcademyIP".</li>
+    <li>Página 21: "netwroks" e "Invoice Terms: Invoice Terms:".</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3. Alcance</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Dentro de V1</h3>
+      <ul>
+        <li>Solicitud por Telegram (chat privado) con nombre, URL y modo campus.</li>
+        <li>Plantilla Full-Service en HTML, fiel al PDF de Canva, con sus dos variantes (red y un campus).</li>
+        <li>Nombre con variantes y fecha del día.</li>
+        <li>Tres fotos: del sitio de la escuela y, si no hay, generadas con IA.</li>
+        <li>Vista previa en PDF completo, con cambios por texto libre o foto subida.</li>
+        <li>Entrega del mismo PDF aprobado, en el chat y con link firmado de 30 días.</li>
+        <li>Validación automática antes de mandar cualquier PDF.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Fuera de V1</h3>
+      <ul>
+        <li>Integración con Scale CRM (fase 3, se coordina con ambos lados).</li>
+        <li>Otras plantillas (EnrollED, respuestas a RFP).</li>
+        <li>Cambiar precios, paquetes o textos por escuela.</li>
+        <li>Nombre del contacto o firma prellenada.</li>
+        <li>Envío automático al cliente por correo.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout">
+    <span class="label">Explícitamente no</span>
+    <p>Propel no redacta ni reescribe texto de la propuesta. Las dos variantes del texto (red y un campus) se aprueban una vez en la fase 0 y quedan fijas en la plantilla. El modelo solo decide las variantes del nombre y qué foto va en cada espacio. El resto es código determinístico.</p>
+  </div>
+  <div class="callout">
+    <span class="label">Tampoco se construye</span>
+    <p>Una Web UI propia de Propel. Después de Telegram, la interfaz será Scale CRM.</p>
+  </div>
+</section>
+
+<section id="s4">
+  <h2>4. Stack</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Capa</th><th>Decisión</th><th>Notas</th></tr></thead>
+      <tbody>
+        <tr><td>Framework</td><td>eve 0.67</td><td>Scaffold ya creado en <code>proposal-creator/</code></td></tr>
+        <tr><td>Repo</td><td><code>github.com/andresglezmora/propel-agent</code></td><td>Remote <code>origin</code> configurado. Llave SSH de trusted-scale.</td></tr>
+        <tr><td>Hosting</td><td>Vercel, mismo team que LandingPilot</td><td>Deploy automático desde GitHub</td></tr>
+        <tr><td>Modelo</td><td>AI Gateway de Vercel</td><td>El modelo por default se elige con evals en la fase 1. Candidatos: <code>openai/gpt-5.6-terra</code> y <code>anthropic/claude-sonnet-5</code>, más una opción barata.</td></tr>
+        <tr><td>Imágenes IA</td><td><code>gpt-image-2</code> por el Gateway</td><td>Estilo fotográfico de LandingPilot</td></tr>
+        <tr><td>Scraping</td><td>Firecrawl</td><td>Se reusa <code>harvestSite</code> de LandingPilot</td></tr>
+        <tr><td>Plantilla</td><td>HTML/CSS en el repo</td><td>Manrope e Inter de Google Fonts, iconos Phosphor, logos de <code>brand/</code></td></tr>
+        <tr><td>PDF</td><td><code>@sparticuz/chromium</code> + <code>puppeteer-core</code></td><td>Dentro de la función de Vercel</td></tr>
+        <tr><td>Datos y archivos</td><td>Supabase, compartido con LandingPilot</td><td>Schema <code>propel</code> y bucket propio (sección 8)</td></tr>
+        <tr><td>Canal V1</td><td>Telegram, chat privado</td><td>Lista de chats permitidos, fail-closed (ya implementado)</td></tr>
+        <tr><td>Canal V2</td><td>Scale CRM</td><td>Mismo contrato de webhooks que LandingPilot</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5. Plantilla y render del PDF</h2>
+  <p>Se evaluaron tres caminos. Se eligió reconstruir la plantilla en HTML: da control total, se versiona en git, no depende de licencias y permite validar el resultado. Canva Autofill requiere Enterprise y no resuelve variantes ni validación. Editar el PDF exportado se descartó porque Canva incrusta solo los glifos que usa cada texto y los títulos tienen capas duplicadas.</p>
+  <p>La plantilla HTML pasa a ser la única versión maestra de la propuesta. Los cambios de diseño se hacen en el repo, ya no en Canva.</p>
+
+  <h3>Sistema visual (sacado del PDF)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td><code>--purple</code></td><td>#3E2A6A</td><td>Texto principal, fondos oscuros</td></tr>
+        <tr><td><code>--coral</code></td><td>#F63D21</td><td>Acentos y palabras destacadas de los títulos</td></tr>
+        <tr><td><code>--gradient</code></td><td>#FF3400 → #CC74F7</td><td>Barras inferiores y separadores</td></tr>
+        <tr><td><code>--green</code></td><td>#00BE62</td><td>Checks de la tabla de precios</td></tr>
+        <tr><td><code>--lavender</code></td><td>#E4DFEB</td><td>Fondo de tarjetas</td></tr>
+        <tr><td><code>--navy</code></td><td>#020D1F</td><td>Bandas oscuras (páginas 5 y 8)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Elemento</th><th>Tipografía</th></tr></thead>
+      <tbody>
+        <tr><td>Títulos y encabezados</td><td>Manrope Bold y ExtraBold, como en el PDF</td></tr>
+        <tr><td>Cuerpo de la propuesta (páginas 1 a 13)</td><td>Manrope Regular</td></tr>
+        <tr><td>Cuerpo del Agreement (páginas 15 a 21)</td><td>Inter Regular y Bold</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Tamaños, interlineado y espaciado se ajustan en la fase 0 comparando página por página contra el PDF original.</p>
+
+  <h3>Assets</h3>
+  <ul>
+    <li><strong>Logos:</strong> <code>brand/trusted-logo-dark.png</code> (1698 px) y <code>brand/trusted-logo-white.png</code> (1957 px), PNG transparentes. Sustituyen las copias de 432 px del PDF.</li>
+    <li><strong>Iconos:</strong> Phosphor, peso regular, uno por cada icono vectorial de Canva (páginas 3, 4, 6, 8 y 12). La tabla de correspondencia se aprueba en la fase 0.</li>
+    <li><strong>Imágenes fijas:</strong> se extraen del PDF de Canva (64 imágenes incrustadas: fotos de TrustED, capturas del CRM, piezas de Aspire, logos de los testimonios).</li>
+  </ul>
+
+  <h3>Cómo se arma</h3>
+  <ul>
+    <li>Cada página es un <code>&lt;section class="page"&gt;</code> de 8.5 × 11 in con <code>@page { size: letter; margin: 0 }</code>.</li>
+    <li>Variables: <code>{{school.name}}</code>, <code>{{school.possessive}}</code>, <code>{{date}}</code>, <code>{{photo.cover}}</code>, <code>{{photo.mission}}</code>, <code>{{photo.testimonials}}</code>.</li>
+    <li>Las frases de red se marcan en la plantilla como bloques con dos versiones, por ejemplo <code>&lt;span data-campus="network"&gt;</code> y <code>&lt;span data-campus="single"&gt;</code>. El render deja solo la que corresponde.</li>
+    <li>Si falta alguna variable, el render falla y no produce PDF.</li>
+    <li>Las fotos se recortan al tamaño del espacio y se comprimen antes del render, para que el PDF quede entre 3 y 5 MB.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6. Diseño del agente</h2>
+  <h3>Identidad</h3>
+  <blockquote>
+    <p>Eres Propel, el agente de TrustED que prepara propuestas Full-Service. Recibes el nombre, el sitio y el modo campus de una escuela, consigues las mejores fotos disponibles y entregas el PDF. La portada siempre lleva la mejor foto. Nunca cambias el texto de la propuesta. Hablas con el equipo en español, breve y concreto.</p>
+  </blockquote>
+
+  <h3>Flujo</h3>
+  <pre>Telegram: "PROUD Academy, https://proudacademy.org, red"
+   │
+   ├─ 1. start_proposal       crea el registro, fecha y variantes del nombre.
+   │                          Si falta el modo campus o el nombre es ambiguo, pregunta.
+   ├─ 2. harvest_site_photos  Firecrawl sobre el sitio, candidatas verificadas
+   ├─ 3. rank_photos          modelo con visión: asigna una foto a cada espacio,
+   │                          empezando por la portada
+   ├─ 4. generate_ai_photo    solo para los espacios sin candidata útil
+   ├─ 5. render_proposal      HTML → PDF → validación → vista previa al chat
+   │
+   │   El equipo responde:
+   │   • "en la portada usa una del gym"  → set_slot_photo → vuelve a 5
+   │   • sube una foto: "esta va en la 2" → set_slot_photo → vuelve a 5
+   │   • [Aprobar]
+   │
+   └─ 6. deliver_proposal     marca la versión aprobada como final (el mismo archivo),
+                              manda el PDF y un link firmado de 30 días</pre>
+
+  <h3>Estados</h3>
+  <pre>received → harvesting → rendering → awaiting_approval → delivered
+                             ▲               │
+                             └── changes ────┘
+cualquiera → failed   (con motivo legible en el chat)</pre>
+
+  <h3>Qué hace el modelo y qué hace el código</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Modelo</th><th>Código</th></tr></thead>
+      <tbody>
+        <tr><td>Variantes del nombre y cuándo preguntar</td><td>Reemplazo de variables y bloques de campus</td></tr>
+        <tr><td>Elegir la foto para cada espacio</td><td>Recorte, redimensión y compresión</td></tr>
+        <tr><td>Escribir el prompt de la imagen IA</td><td>Render, validación y subida</td></tr>
+        <tr><td>Entender los cambios pedidos en texto libre</td><td>Estados, versiones, tope de imágenes y entrega</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s7">
+  <h2>7. Fotos</h2>
+  <h3>Orden de búsqueda por espacio</h3>
+  <ol>
+    <li><strong>Sitio de la escuela.</strong> <code>harvestSite</code> de LandingPilot (img, srcset, og:image, fondos CSS) con sus filtros de iconos y decorativos. Mínimo 1200 px en el lado largo para la portada y 800 px para las otras dos.</li>
+    <li><strong>Imagen IA.</strong> <code>gpt-image-2</code>, solo si el sitio no tiene una candidata útil para ese espacio.</li>
+  </ol>
+  <p>No se usa stock. Cada foto guarda su origen (<code>site</code>, <code>ai</code> o <code>upload</code>) y el mensaje de la vista previa lo dice, para que quien aprueba sepa qué está mandando.</p>
+
+  <h3>Criterios para la portada</h3>
+  <p>Es la foto más visible y va primero en la selección. El modelo prefiere, en este orden: alumnos en actividad real en la escuela, buena luz, sin texto ni logos encima, horizontal y con el centro de interés compatible con el recorte curvo. Si la mejor candidata del sitio no alcanza 1200 px, se genera con IA en lugar de estirarla. La foto actual de PROUD mide 549 × 350 px y se ve pixelada.</p>
+
+  <h3>Reglas de la imagen IA</h3>
+  <ul>
+    <li>Puede haber personas, pero nadie reconocible en primer plano: grupos, de espaldas, fuera de foco o a media distancia.</li>
+    <li>Sin texto, letreros ni logos generados.</li>
+    <li>Estilo fotográfico realista, sin forzar los colores de la escuela.</li>
+    <li>Normalmente se generan como máximo 3 (una por espacio). Tope duro de 6 por propuesta, contando las regeneraciones pedidas por el equipo. Al llegar al tope, Propel lo avisa y pide una foto subida.</li>
+  </ul>
+</section>
+
+<section id="s8">
+  <h2>8. Datos: Supabase compartido</h2>
+  <p>El plan gratuito ya no permite otro proyecto, así que Propel usa el proyecto de LandingPilot. Es una práctica común con apps pequeñas del mismo equipo, siempre que cada app tenga su propio espacio y nunca toque el de la otra.</p>
+
+  <h3>Reglas de convivencia</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Tema</th><th>LandingPilot</th><th>Propel</th></tr></thead>
+      <tbody>
+        <tr><td>Tablas y enums</td><td>Schema <code>public</code></td><td>Schema <code>propel</code></td></tr>
+        <tr><td>Storage</td><td>Bucket <code>brand-assets</code></td><td>Bucket privado <code>propel-proposals</code></td></tr>
+        <tr><td>Migraciones</td><td><code>supabase db push</code>, como hoy</td><td>Script propio <code>npm run db:migrate</code>, con registro en <code>propel.schema_migrations</code>. Nunca <code>db push</code> ni <code>migration repair</code>.</td></tr>
+        <tr><td>Acceso anónimo</td><td>La anon key inserta leads desde las landings</td><td>Sin grants para <code>anon</code> ni <code>authenticated</code>. RLS activo sin políticas.</td></tr>
+        <tr><td>Cliente en código</td><td>Schema por default</td><td><code>createClient(url, key, { db: { schema: "propel" } })</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Propel no lee ni referencia tablas de LandingPilot en V1. Si después se quiere cruzar "esta escuela tiene landing y propuesta", se hace con una vista.</p>
+
+  <div class="callout">
+    <span class="label">Por qué un script de migraciones propio</span>
+    <p>El CLI de Supabase lleva un solo historial de migraciones por proyecto. Un <code>db push</code> desde el repo de Propel vería las 11 migraciones de LandingPilot como faltantes y se negaría a seguir, y "arreglarlo" con <code>migration repair</code> desordena el historial de LandingPilot. El script de Propel solo toca el schema <code>propel</code> y lleva su propio registro.</p>
+  </div>
+
+  <div class="callout">
+    <span class="label">Riesgo aceptado</span>
+    <p>La <code>service_role</code> key vale para todo el proyecto, así que Propel técnicamente podría tocar datos de LandingPilot. Se acepta en V1 porque las dos apps son del mismo equipo y el aislamiento está en el código. Si se necesita más, se crea un rol de Postgres solo para Propel.</p>
+  </div>
+
+  <h3>Esquema</h3>
+  <pre>create schema propel;
+
+propel.proposals
+  id                uuid pk
+  school_name       text            -- "PROUD Academy"
+  school_possessive text            -- "PROUD Academy's"
+  school_short      text null
+  website_url       text
+  campus_mode       propel.campus_mode   -- single | network
+  proposal_date     date
+  template_version  text            -- hash de git de template/
+  status            propel.proposal_status
+  approved_version  int null        -- qué versión se entregó
+  ai_images_used    int default 0   -- para el tope de 6
+  requested_by      text            -- telegram user id
+  telegram_chat_id  text
+  error             text null
+  created_at, updated_at timestamptz
+
+propel.proposal_versions
+  id            uuid pk
+  proposal_id   uuid fk → proposals
+  version       int             -- 1, 2, 3...
+  pdf_path      text            -- propel-proposals/{proposal_id}/v{n}.pdf
+  size_bytes    int
+  created_at    timestamptz
+
+propel.proposal_photos
+  id            uuid pk
+  proposal_id   uuid fk → proposals
+  slot          text     -- cover | mission | testimonials
+  source        text     -- site | ai | upload
+  source_url    text     -- URL original, prompt de IA o file_id de Telegram
+  storage_path  text     -- versión recortada que usa el PDF
+  width, height int
+  selected      bool
+  created_at    timestamptz
+
+propel.proposal_events
+  id, proposal_id, type, payload jsonb, created_at
+
+propel.schema_migrations
+  version text pk, applied_at timestamptz</pre>
+
+  <h3>Límites del plan gratuito (compartidos entre las dos apps)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Límite</th><th>Plan</th></tr></thead>
+      <tbody>
+        <tr><td>Storage: 1 GB</td><td>PDFs de 3 a 5 MB con fotos comprimidas. Las versiones no aprobadas y sus fotos se borran a los 30 días; se conserva solo el PDF entregado.</td></tr>
+        <tr><td>Base de datos: 500 MB</td><td>Propel guarda muy pocos datos, no es un problema.</td></tr>
+        <tr><td>Pausa por inactividad</td><td>Con dos apps usando el proyecto es menos probable que pase.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s9">
+  <h2>9. Tools, canales e integraciones</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Tool</th><th>Qué hace</th><th>Aprobación</th></tr></thead>
+      <tbody>
+        <tr><td><code>start_proposal</code></td><td>Crea el registro con nombre, variantes, URL, modo campus y fecha</td><td>No</td></tr>
+        <tr><td><code>harvest_site_photos</code></td><td>Barre el sitio y registra candidatas verificadas</td><td>No</td></tr>
+        <tr><td><code>rank_photos</code></td><td>Asigna la mejor candidata a cada espacio, con motivo</td><td>No</td></tr>
+        <tr><td><code>generate_ai_photo</code></td><td>Genera la imagen de un espacio y aplica el tope</td><td>No</td></tr>
+        <tr><td><code>set_slot_photo</code></td><td>Fija una foto en un espacio: otra del sitio, IA o una subida al chat</td><td>No</td></tr>
+        <tr><td><code>render_proposal</code></td><td>HTML → PDF, validación, sube la versión y manda la vista previa</td><td>No</td></tr>
+        <tr><td><code>deliver_proposal</code></td><td>Marca la versión como final, manda el PDF y el link firmado</td><td>Sí, botón de Telegram</td></tr>
+        <tr><td><code>list_proposals</code></td><td>Historial por escuela o fecha</td><td>No</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Skills: <code>photo-selection</code> (criterios por espacio, con la portada primero) y <code>school-name-variants</code> (posesivos, artículos y abreviaturas).</p>
+
+  <h3>Canales</h3>
+  <ul>
+    <li><strong>Telegram (V1).</strong> Chat privado. Lista de chats permitidos, fail-closed. Acepta fotos y PDFs subidos de hasta 10 MB. Archivo entregado: <code>Proposal - {School}.pdf</code>.</li>
+    <li><strong>Scale CRM (V2).</strong> Canal <code>POST /propel/task</code> con el mismo contrato de LandingPilot: <code>kind: "create"</code> con escuela, URL y modo campus, y <code>kind: "comment"</code> para pedir cambios desde la tarjeta. El estado vuelve a Scale por webhook. Se implementa coordinando con el repo <code>trusted-scale</code>.</li>
+  </ul>
+
+  <h3>Variables de entorno</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Variable</th><th>Origen</th></tr></thead>
+      <tbody>
+        <tr><td><code>AI_GATEWAY_API_KEY</code> (o OIDC de Vercel)</td><td>Vercel, mismo team</td></tr>
+        <tr><td><code>FIRECRAWL_API_KEY</code></td><td>La misma de LandingPilot</td></tr>
+        <tr><td><code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Las mismas de LandingPilot</td></tr>
+        <tr><td><code>SUPABASE_DB_URL</code></td><td>Nueva, solo para <code>db:migrate</code></td></tr>
+        <tr><td><code>TELEGRAM_BOT_TOKEN</code>, <code>TELEGRAM_WEBHOOK_SECRET_TOKEN</code>, <code>TELEGRAM_ALLOWED_CHAT_IDS</code></td><td>Bot nuevo de BotFather</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s10">
+  <h2>10. Criterios de aceptación y evals</h2>
+  <h3>Validación antes de mandar cualquier PDF</h3>
+  <ul>
+    <li>Exactamente 21 páginas tamaño carta.</li>
+    <li>El texto extraído no contiene <code>{{</code>, bloques de campus sin resolver ni "PROUD" (salvo que la escuela sea PROUD).</li>
+    <li>En modo <code>single</code>, no aparece "Network-wide".</li>
+    <li>El nombre aparece en todas las posiciones esperadas.</li>
+    <li>Las 3 fotos existen y cumplen la resolución mínima.</li>
+    <li>El archivo pesa menos de 8 MB, con meta de 3 a 5 MB.</li>
+  </ul>
+
+  <h3>Evals</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Caso</th><th>Qué se espera</th></tr></thead>
+      <tbody>
+        <tr><td>Regenerar PROUD Academy (red) con sus fotos originales</td><td>Diferencia visual contra el PDF de Canva por debajo del umbral en cada página</td></tr>
+        <tr><td>Escuela con buen sitio y fotos grandes</td><td>3 fotos del sitio, ninguna IA. La portada es la mejor de las candidatas.</td></tr>
+        <tr><td>Sitio sin fotos útiles</td><td>3 imágenes IA, sin nadie reconocible en primer plano, y lo dice en la vista previa</td></tr>
+        <tr><td>Sitio caído o SPA vacía</td><td>Avisa y ofrece seguir con IA, sin inventar nada</td></tr>
+        <tr><td>Escuela de un solo campus</td><td>Sin "Network-wide" y con todas las frases en su versión de un campus</td></tr>
+        <tr><td>Nombre terminado en "s" (St. Mary's, Williams Academies)</td><td>Posesivo correcto</td></tr>
+        <tr><td>Nombre largo (más de 40 caracteres)</td><td>La portada no se desborda</td></tr>
+        <tr><td>"En la portada usa una del gym"</td><td>Solo cambia la portada y manda una versión nueva</td></tr>
+        <tr><td>Foto subida al chat con "va en la 2"</td><td>Se usa en el espacio de la página 2</td></tr>
+        <tr><td>Séptima imagen IA pedida</td><td>Se niega por el tope y pide una foto subida</td></tr>
+        <tr><td>Chat fuera de la lista</td><td>El bot no responde</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Estos mismos casos se corren con cada modelo candidato del Gateway para elegir el default por calidad de selección de fotos y costo.</p>
+</section>
+
+<section id="s11">
+  <h2>11. Riesgos y mitigaciones</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Riesgo</th><th>Mitigación</th></tr></thead>
+      <tbody>
+        <tr><td>La reconstrucción en HTML no queda fiel a Canva</td><td>Comparación visual página por página como criterio de salida de la fase 0</td></tr>
+        <tr><td>Canva y el HTML se separan con el tiempo</td><td>Desde el lanzamiento, el HTML es la única versión maestra</td></tr>
+        <tr><td>Imágenes IA que parecen alumnos reales de la escuela</td><td>Nadie reconocible en primer plano. El origen se muestra en la vista previa.</td></tr>
+        <tr><td>Migraciones de Propel rompen el historial de LandingPilot</td><td>Script propio, solo sobre el schema <code>propel</code>, sin CLI de Supabase</td></tr>
+        <tr><td>La anon key de las landings expone datos de Propel</td><td>Sin grants para <code>anon</code>, RLS sin políticas, bucket privado</td></tr>
+        <tr><td>Se llena 1 GB de Storage compartido</td><td>PDFs comprimidos y limpieza de versiones no aprobadas a los 30 días</td></tr>
+        <tr><td>Chromium no cabe o tarda en la función</td><td>Prueba real en la fase 0. Alternativa: sandbox de eve.</td></tr>
+        <tr><td>Datos de contacto de clientes en los testimonios</td><td>Quedan como están, por decisión del equipo</td></tr>
+        <tr><td>Alguien fuera del equipo usa el bot</td><td>Lista de chats permitidos, fail-closed</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s12">
+  <h2>12. Roadmap</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Fase</th><th>Entregable</th><th>Criterio de salida</th></tr></thead>
+      <tbody>
+        <tr><td>0. Plantilla</td><td>21 páginas en HTML con assets, iconos Phosphor, variables y errores corregidos. Tabla de frases para un campus. Script local que genera el PDF. Prueba de Chromium en Vercel.</td><td>El equipo aprueba el PDF de PROUD regenerado, la tabla de iconos y la tabla de frases.</td></tr>
+        <tr><td>1. Agente en Telegram</td><td>Schema <code>propel</code> y bucket, tools, fotos, vista previa, cambios, entrega. Evals y elección de modelo.</td><td>5 propuestas reales aprobadas sin cambios manuales.</td></tr>
+        <tr><td>2. Afinado</td><td>Limpieza de Storage, métricas de tiempo y costo por propuesta, ajustes de selección de fotos.</td><td>9 de cada 10 propuestas aprobadas sin cambios durante 2 semanas.</td></tr>
+        <tr><td>3. Scale CRM</td><td>Canal <code>/propel/task</code> y webhook de estado, coordinado con <code>trusted-scale</code>.</td><td>Una propuesta pedida y aprobada desde una tarjeta de Scale.</td></tr>
+        <tr><td>4. Más plantillas</td><td>EnrollED y otras propuestas.</td><td>Por definir.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s13">
+  <h2>13. Estructura del repo</h2>
+  <pre>propel-agent/                      (local: proposal-creator/)
+├── PRD.html
+├── brand/
+│   ├── trusted-logo-dark.png      ya existe
+│   └── trusted-logo-white.png     ya existe
+├── agent/
+│   ├── agent.ts
+│   ├── instructions.md
+│   ├── channels/
+│   │   ├── telegram.ts            ya existe
+│   │   └── scale.ts               fase 3
+│   ├── tools/
+│   │   ├── start_proposal.ts
+│   │   ├── harvest_site_photos.ts
+│   │   ├── rank_photos.ts
+│   │   ├── generate_ai_photo.ts
+│   │   ├── set_slot_photo.ts
+│   │   ├── render_proposal.ts
+│   │   ├── deliver_proposal.ts
+│   │   └── list_proposals.ts
+│   ├── skills/
+│   │   ├── photo-selection.md
+│   │   └── school-name-variants.md
+│   └── lib/
+│       ├── scrape.ts              copiado de LandingPilot
+│       ├── image-gen.ts           adaptado de LandingPilot
+│       ├── photos.ts              recorte y compresión
+│       ├── render.ts              HTML → PDF
+│       ├── validate.ts
+│       └── db.ts                  cliente con schema "propel"
+├── template/
+│   └── full-service/
+│       ├── index.html             21 páginas
+│       ├── styles.css
+│       ├── slots.json             espacios de foto: tamaño, orientación, mínimo
+│       └── assets/                extraídos del PDF de Canva
+├── db/
+│   └── migrations/                SQL solo del schema propel
+├── evals/
+│   └── fixtures/proud-academy/    PDF original y fotos para la comparación
+└── scripts/
+    ├── migrate.ts                 npm run db:migrate
+    ├── extract-canva-assets.py
+    └── render-local.ts</pre>
+</section>
+
+<section id="s14">
+  <h2>14. Pendientes</h2>
+  <ul>
+    <li><strong>Antes de la fase 1:</strong> agregar <code>propel</code> a los schemas expuestos del API de Supabase (Settings → API) y crear el bot de Telegram.</li>
+    <li><strong>En la fase 0:</strong> aprobar la tabla de frases para un campus, la de iconos Phosphor y el PDF de PROUD regenerado.</li>
+    <li><strong>En la fase 1:</strong> elegir el modelo default según los evals.</li>
+    <li><strong>En la fase 3:</strong> coordinar con <code>trusted-scale</code> el contrato del canal y del webhook.</li>
+  </ul>
+</section>
+
+<footer class="doc">
+  Propel · PRD · 28 de septiembre de 2026
+</footer>
+
+</div>
+</body>
+</html>

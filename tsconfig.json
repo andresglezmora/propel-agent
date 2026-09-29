@@ -3,11 +3,15 @@
     "target": "ES2022",
     "module": "esnext",
     "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "types": ["node", "eve/workflow-modules"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "#lib/*": ["./agent/lib/*"]
+    }
   },
-  "include": ["agent/**/*.ts", "evals/**/*.ts"]
+  "include": ["agent/**/*.ts", "evals/**/*.ts", "react/**/*.tsx", "react/**/*.ts"]
 }

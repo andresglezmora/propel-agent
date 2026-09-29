@@ -1,0 +1,67 @@
+/* Sistema de diseño de la propuesta Full-Service — escrito a mano, no
+   generado. Tokens sacados del PDF de Canva (ver PRD sección 5), pero el
+   LAYOUT de cada página es CSS real (flex/grid), no coordenadas clonadas. */
+
+:root {
+  --purple: #3e2a6a;
+  --purple-dark: #3b164b;
+  --coral: #f63d21;
+  --coral-light: #ff3400;
+  --violet: #cc74f7;
+  --green: #00be62;
+  --lavender: #e4dfeb;
+  --navy: #020d1f;
+  --ink: #1a1a2e;
+  --muted: #5b5b6e;
+  --bg: #ffffff;
+
+  --gradient-brand: linear-gradient(90deg, var(--coral-light), var(--violet));
+
+  --font-display: "Manrope", ui-sans-serif, sans-serif;
+  --font-body-alt: "Inter", ui-sans-serif, sans-serif; /* Service Agreement (fase posterior) */
+
+  --page-w: 816px;
+  --page-h: 1056px;
+  --gutter: 64px;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #ddd; }
+
+.page {
+  position: relative;
+  width: var(--page-w);
+  height: var(--page-h);
+  background: var(--bg);
+  overflow: hidden;
+  margin: 0 auto 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.eyebrow-gradient-bar {
+  height: 6px;
+  width: 64px;
+  background: var(--gradient-brand);
+  border-radius: 3px;
+}
+
+@media print {
+  html, body { background: #fff; }
+  .page { margin: 0; box-shadow: none; page-break-after: always; }
+}
+@page { size: letter; margin: 0; }
