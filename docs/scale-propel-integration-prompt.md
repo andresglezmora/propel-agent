@@ -11,12 +11,12 @@ esto como tarjetas. Primero revisa si Scale ya tiene algo de mensajería/canales
 que se pueda extender, y dime qué encontraste antes de crear tablas nuevas.
 
 ## 1. Producto (lo que el equipo debe poder hacer)
-- Un módulo de **canales** con al menos el canal **#propel** (el diseño debe
+- Un módulo de **canales** con al menos el canal **#proposals** (el diseño debe
   permitir otros canales y otros agentes después, p. ej. LandingPilot).
-- Mensajes con **hilos**: cada mensaje de nivel superior en #propel puede abrir
+- Mensajes con **hilos**: cada mensaje de nivel superior en #proposals puede abrir
   un hilo; Propel responde **dentro del hilo**. Todos los miembros del canal ven
   el hilo, pueden escribir en él y ver quién dijo qué.
-- Reglas de cuándo se le habla a Propel: (a) cualquier mensaje en #propel; (b)
+- Reglas de cuándo se le habla a Propel: (a) cualquier mensaje en #proposals; (b)
   en otros canales, solo si mencionan `@Propel`. Los mensajes de humanos que no
   le hablan a Propel no se reenvían.
 - Mensajes de **Propel** con etiqueta/avatar de agente, indicador **«Propel
@@ -87,7 +87,7 @@ En el proyecto Supabase de Scale: `PROPEL_TASK_WEBHOOK_SECRET` y
 `supabase secrets set` desde el `.env.local` de Propel.
 
 ## 6. Cómo probarlo (criterios de aceptación)
-1. En #propel escribo: «Hazme la proposal de Aspire Public Schools,
+1. En #proposals escribo: «Hazme la proposal de Aspire Public Schools,
    aspirepublicschools.org, red de campus». Aparece «Propel está escribiendo…».
 2. En ~1 min Propel responde en el hilo con un resumen y un mensaje «Preview
    v1» con el PDF adjunto (`Proposal - Aspire Public Schools (preview v1).pdf`).

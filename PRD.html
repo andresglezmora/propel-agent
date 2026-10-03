@@ -237,7 +237,7 @@ footer.doc { border-top:1px solid var(--rule); padding-top:20px; margin-top:24px
 <div class="grid">
 <div class="card"><h3>Dentro de V1</h3><ul>
 <li>Telegram, en chat privado</li>
-<li>Canal #propel en Scale CRM, con hilos</li>
+<li>Canal #proposals en Scale CRM, con hilos</li>
 <li>Fotos desde el sitio de la escuela (Firecrawl)</li>
 <li>Imágenes con IA cuando el sitio no sirve, máximo 6</li>
 <li>PDF de la plantilla Full-Service, 19 páginas</li>
@@ -563,7 +563,7 @@ footer.doc { border-top:1px solid var(--rule); padding-top:20px; margin-top:24px
 <g class="node ">
 <text class="kind" x="450.0" y="33.0">CANAL</text>
 <rect class="box" x="450.0" y="42.0" width="300" height="87.0" rx="3"/>
-<text class="title" x="464.0" y="66.0">Scale CRM, canal #propel</text>
+<text class="title" x="464.0" y="66.0">Scale CRM, canal #proposals</text>
 <text class="cap" x="464.0" y="82.0">Hilos. Entra por propel-dispatch y vuelve</text>
 <text class="cap" x="464.0" y="98.0">por propel-webhook.</text>
 </g>
@@ -833,8 +833,8 @@ footer.doc { border-top:1px solid var(--rule); padding-top:20px; margin-top:24px
 <figcaption>Diagrama 9. Telegram: quién puede hablar y cómo llegan los archivos.</figcaption></figure>
 <p>El bot es <code>@trustedpropel_bot</code>. Telegram entrega los mensajes al webhook <code>/eve/v1/telegram</code> con un secret token. Para agregar a alguien o a un grupo, se suma su <code>chat.id</code> a <code>TELEGRAM_ALLOWED_CHAT_IDS</code>.</p>
 <h3>Scale CRM</h3>
-<p>El equipo habla con Propel en un canal tipo Slack (<code>#propel</code>), con hilos. Un hilo es una conversación y una sesión del agente, y puede producir varias propuestas. Si varias personas escriben en el mismo hilo, cada mensaje llega al agente como <code>[Nombre] texto</code> y Propel responde a cada quien por su nombre.</p>
-<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 1212" style="min-width:700px" role="img" aria-label="Diagrama 10. Un mensaje en #propel, de ida y de vuelta.">
+<p>El equipo habla con Propel en un canal tipo Slack (<code>#proposals</code>), con hilos. Un hilo es una conversación y una sesión del agente, y puede producir varias propuestas. Si varias personas escriben en el mismo hilo, cada mensaje llega al agente como <code>[Nombre] texto</code> y Propel responde a cada quien por su nombre.</p>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 1212" style="min-width:700px" role="img" aria-label="Diagrama 10. Un mensaje en #proposals, de ida y de vuelta.">
 <defs><marker id="arr-scale" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
 <path d="M 140.0 129.0 L 140.0 165.0" class="edge" marker-end="url(#arr-scale)"/>
 <path d="M 255.0 232.5 L 263.0 232.5 Q 270.0 232.5 270.0 239.5 L 270.0 380.5 Q 270.0 387.5 277.0 387.5 L 285.0 387.5" class="edge" marker-end="url(#arr-scale)"/>
@@ -846,7 +846,7 @@ footer.doc { border-top:1px solid var(--rule); padding-top:20px; margin-top:24px
 <g class="node human">
 <text class="kind" x="25.0" y="33.0">PERSONA</text>
 <rect class="box" x="25.0" y="42.0" width="230" height="87.0" rx="3"/>
-<text class="title" x="39.0" y="66.0">Escribe en #propel</text>
+<text class="title" x="39.0" y="66.0">Escribe en #proposals</text>
 <text class="cap" x="39.0" y="82.0">Por ejemplo: Hazme la proposal de</text>
 <text class="cap" x="39.0" y="98.0">Aspire, red de campus.</text>
 </g>
@@ -902,7 +902,7 @@ footer.doc { border-top:1px solid var(--rule); padding-top:20px; margin-top:24px
 <text class="cap" x="39.0" y="1159.0">resumen y el PDF.</text>
 </g>
 </svg></div>
-<figcaption>Diagrama 10. Un mensaje en #propel, de ida y de vuelta.</figcaption></figure>
+<figcaption>Diagrama 10. Un mensaje en #proposals, de ida y de vuelta.</figcaption></figure>
 <h4>Contrato: Scale a Propel</h4>
 <pre><code>POST https://propel-agent.vercel.app/cowork/message
 Authorization: Bearer &lt;PROPEL_TASK_WEBHOOK_SECRET&gt;

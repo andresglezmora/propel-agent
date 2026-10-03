@@ -110,7 +110,7 @@ def d_url():
 def d_arch():
     d = Diagram("arch", "Diagrama 6. Piezas del sistema y quién habla con quién.", 700)
     d.node("tg", 0, 200, 300, "Canal", "Telegram", "Chat privado con @trustedpropel_bot. Solo chats permitidos.")
-    d.node("sc", 0, 600, 300, "Canal", "Scale CRM, canal #propel", "Hilos. Entra por propel-dispatch y vuelve por propel-webhook.")
+    d.node("sc", 0, 600, 300, "Canal", "Scale CRM, canal #proposals", "Hilos. Entra por propel-dispatch y vuelve por propel-webhook.")
     d.node("ag", 1, 400, 480, "Agente", "Propel, un agente eve en Vercel", "Dos canales, 7 tools, 2 skills e instrucciones. Proyecto propel-agent, URL propel-agent.vercel.app.")
     d.node("fc", 2, 105, 190, "Servicio", "Firecrawl", "Lee el sitio de la escuela.")
     d.node("ai", 2, 305, 190, "Servicio", "AI Gateway", "Modelo del agente e imágenes con gpt-image-2.")
@@ -175,8 +175,8 @@ def d_telegram():
 
 
 def d_scale():
-    d = Diagram("scale", "Diagrama 10. Un mensaje en #propel, de ida y de vuelta.", 700)
-    d.node("p", 0, 140, 230, "Persona", "Escribe en #propel", "Por ejemplo: Hazme la proposal de Aspire, red de campus.")
+    d = Diagram("scale", "Diagrama 10. Un mensaje en #proposals, de ida y de vuelta.", 700)
+    d.node("p", 0, 140, 230, "Persona", "Escribe en #proposals", "Por ejemplo: Hazme la proposal de Aspire, red de campus.")
     d.node("db", 1, 140, 230, "Scale", "Guarda el mensaje", "Lo pone en agent_outbox para entregarlo con reintentos.")
     d.node("disp", 2, 400, 230, "Edge function", "propel-dispatch", "POST a /cowork/message con messageId, threadId, autor y adjuntos.")
     d.node("in", 3, 660, 230, "Propel", "Recibe", "Verifica el secreto, descarta duplicados por messageId y responde 200.")
@@ -244,7 +244,7 @@ section("alcance", "Alcance", """
 <div class="grid">
 <div class="card"><h3>Dentro de V1</h3><ul>
 <li>Telegram, en chat privado</li>
-<li>Canal #propel en Scale CRM, con hilos</li>
+<li>Canal #proposals en Scale CRM, con hilos</li>
 <li>Fotos desde el sitio de la escuela (Firecrawl)</li>
 <li>Imágenes con IA cuando el sitio no sirve, máximo 6</li>
 <li>PDF de la plantilla Full-Service, 19 páginas</li>
@@ -383,7 +383,7 @@ section("canales", "Canales", f"""
 {d_telegram()}
 <p>El bot es <code>@trustedpropel_bot</code>. Telegram entrega los mensajes al webhook <code>/eve/v1/telegram</code> con un secret token. Para agregar a alguien o a un grupo, se suma su <code>chat.id</code> a <code>TELEGRAM_ALLOWED_CHAT_IDS</code>.</p>
 <h3>Scale CRM</h3>
-<p>El equipo habla con Propel en un canal tipo Slack (<code>#propel</code>), con hilos. Un hilo es una conversación y una sesión del agente, y puede producir varias propuestas. Si varias personas escriben en el mismo hilo, cada mensaje llega al agente como <code>[Nombre] texto</code> y Propel responde a cada quien por su nombre.</p>
+<p>El equipo habla con Propel en un canal tipo Slack (<code>#proposals</code>), con hilos. Un hilo es una conversación y una sesión del agente, y puede producir varias propuestas. Si varias personas escriben en el mismo hilo, cada mensaje llega al agente como <code>[Nombre] texto</code> y Propel responde a cada quien por su nombre.</p>
 {d_scale()}
 <h4>Contrato: Scale a Propel</h4>
 <pre><code>POST https://propel-agent.vercel.app/cowork/message
