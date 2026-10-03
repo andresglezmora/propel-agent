@@ -35,6 +35,12 @@ Receta `full-service-network`, o `update_plan` para insertar `network-pricing` y
 Los totales ($11,250, $20,000, $25,500) los calcula la plantilla. El número de
 campus de los términos sale de aquí.
 
+El contrato toma el precio de la opción recomendada: en el ejemplo, $1,500 por
+campus, 17 campus y $25,500 al mes reemplazan la tarifa estándar de $2,500 por
+escuela en la cláusula de alcance, en "Fees & Invoicing" y en los Exhibits A y
+C. Con varias opciones, una debe ir con `recommended: true`; si el equipo no
+dijo cuál, pregúntalo antes de renderizar.
+
 ## Páginas a la medida
 
 Para contenido de un trato que no cabe en ningún módulo: `update_plan` con

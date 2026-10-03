@@ -137,6 +137,11 @@ export function resolvePlan(
   const modules: ResolvedModule[] = [];
   for (const id of plan.modules) {
     const module = getModule(id)!;
+    const problem = module.check?.(ctx, plan.modules);
+    if (problem) {
+      errors.push(problem);
+      continue;
+    }
     if (!module.content) {
       modules.push({ module });
       continue;

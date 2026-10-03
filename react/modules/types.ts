@@ -58,6 +58,9 @@ export type ProposalModule = {
   photoSlots?: PhotoSlotSpec[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content?: ModuleContentSpec<any>;
+  /** Validación que depende de otros módulos del plan (p. ej. el contrato
+   * necesita saber qué precio de red usar). Devuelve el problema o null. */
+  check?: (ctx: ProposalContext, planModules: string[]) => string | null;
   /** `content` llega ya resuelto (validado y con defaults). */
   render: (ctx: ProposalContext, content?: unknown) => React.ReactElement;
 };

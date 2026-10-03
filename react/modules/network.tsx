@@ -150,6 +150,30 @@ export const networkPricing: ProposalModule = {
   },
 };
 
+/** Precio que pasa al contrato: la opción recomendada, o la única si hay una
+ * sola. Con varias opciones y ninguna recomendada no hay un precio que firmar. */
+export function networkFeeFrom(ctx: ProposalContext): { fee?: { pricePerCampus: string; campuses: number; total: string }; error?: string } {
+  const raw = ctx.content?.["network-pricing"];
+  if (raw === undefined) return {};
+  const parsed = pricingSchema.safeParse(raw);
+  if (!parsed.success) return {};
+  const tiers = parsed.data.tiers;
+  const chosen = tiers.length === 1 ? tiers[0] : tiers.find((x) => x.recommended);
+  if (!chosen) {
+    return {
+      error:
+        'El contrato toma el precio de la opción recomendada de network-pricing: marca una con recommended:true (o deja una sola opción).',
+    };
+  }
+  return {
+    fee: {
+      pricePerCampus: money(chosen.pricePerCampus),
+      campuses: chosen.campuses,
+      total: money(chosen.campuses * chosen.pricePerCampus),
+    },
+  };
+}
+
 // ───────────────────────── qué incluye ─────────────────────────
 
 const includesSchema = z.object({

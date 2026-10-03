@@ -16,7 +16,7 @@ import { TestimonialsPage } from "../pages/TestimonialsPage";
 import { AgreementCoverPage } from "../pages/AgreementCoverPage";
 import { AgreementPage } from "../pages/AgreementPage";
 import type { ProposalModule } from "./types";
-import { networkPricing, networkIncludes } from "./network";
+import { networkPricing, networkIncludes, networkFeeFrom } from "./network";
 import { customModule, isCustomId } from "./custom";
 
 // Los assets FIJOS de TrustED (logos, capturas de producto, fotos de TrustED,
@@ -165,9 +165,13 @@ const list: ProposalModule[] = [
   {
     id: "agreement",
     title: "Contrato",
-    description: "Texto legal del contrato, después de su portada. Fluye en varias páginas. Nada se inserta entre agreement-cover y agreement.",
+    description:
+      "Texto legal del contrato, después de su portada. Fluye en varias páginas. Nada se inserta entre agreement-cover y agreement. Si la propuesta lleva network-pricing, la tarifa del contrato es la de la opción recomendada (precio por campus, número de campus y total); si no, $2,500 por escuela.",
     pages: null,
-    render: (ctx) => <AgreementPage schoolName={ctx.schoolName} possessive={ctx.schoolPossessive} />,
+    check: (ctx, planModules) => (planModules.includes("network-pricing") ? (networkFeeFrom(ctx).error ?? null) : null),
+    render: (ctx) => (
+      <AgreementPage schoolName={ctx.schoolName} possessive={ctx.schoolPossessive} fee={networkFeeFrom(ctx).fee} />
+    ),
   },
   networkPricing,
   networkIncludes,

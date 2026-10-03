@@ -355,6 +355,17 @@ section("variantes", "Variantes de propuesta", f"""
 </tbody></table></div>
 <h3>Hojas de red</h3>
 <p>Salen de las hojas que se hicieron a mano para Noble Schools, con el mismo diseño. <code>network-pricing</code> lleva hasta 3 opciones (número de campus y precio por campus) y calcula los totales. <code>network-includes</code> lleva servicios incluidos, reportes de distrito y términos, y toma el número de campus de la hoja de precios. Todo su texto tiene un valor por defecto, que es el de Noble con el nombre de la escuela.</p>
+<h3>El contrato toma el precio del trato</h3>
+<p>Si la propuesta lleva <code>network-pricing</code>, el contrato usa la opción recomendada (o la única, si hay una sola) en vez de la tarifa estándar de $2,500 por escuela. Cambian 4 puntos y nada más:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Dónde</th><th>Texto con el ejemplo de Noble</th></tr></thead>
+<tbody>
+<tr><td>Sección 3, alcance</td><td>"…across 17 participating campuses at $1,500 per campus per month ($25,500 per month in total), as set out in the pricing of this proposal."</td></tr>
+<tr><td>Sección 4, Base Service Fee</td><td>"$1,500/month per campus for 17 participating campuses ($25,500/month in total). Changes to the number of participating campuses require a written pricing adjustment."</td></tr>
+<tr><td>Exhibit A</td><td>"Full Service Support, $1,500/mo per campus · 17 campuses"</td></tr>
+<tr><td>Exhibit C, Base Fee</td><td>"$25,500/month (in advance): 17 participating campuses at $1,500/month per campus."</td></tr>
+</tbody></table></div>
+<p>Sin hojas de red el contrato no cambia. Con varias opciones y ninguna recomendada, la propuesta no se renderiza: no habría un precio que firmar.</p>
 <h3>Quién escribe qué</h3>
 {d_content()}
 <h3>Páginas a la medida</h3>
@@ -536,6 +547,7 @@ section("decisiones", "Decisiones y por qué", """
 <tr><td>Scale como interfaz, no una web propia</td><td>El equipo ya trabaja ahí.</td></tr>
 <tr><td>Hilos de conversación en vez de tarjetas Kanban</td><td>Se pide, se revisa y se corrige hablando, y varias personas pueden participar.</td></tr>
 <tr><td>Plantilla en módulos y recetas</td><td>Las variantes (red, campus único, hojas extra de un trato) se arman como listas de módulos, sin duplicar páginas.</td></tr>
+<tr><td>El contrato toma el precio de la opción recomendada</td><td>Si la hoja de red y el contrato tienen precios distintos, el PDF se contradice. La opción recomendada es la que se firma.</td></tr>
 <tr><td>Las cifras son datos y los totales se calculan en código</td><td>Los precios de red son de cada trato y no hay tabla de descuentos. El modelo no multiplica ni inventa números.</td></tr>
 <tr><td>El modelo puede proponer texto, marcado como suyo</td><td>Casi siempre el equipo da el texto. Cuando no, el modelo propone dentro de límites, y la vista previa avisa qué texto es suyo para que se revise antes de aprobar.</td></tr>
 <tr><td>Páginas a la medida con bloques fijos</td><td>Flexibilidad sin diseño improvisado: la página se describe como datos y el renderer garantiza el estilo.</td></tr>
@@ -580,7 +592,7 @@ section("pendientes", "Pendientes por prioridad", """
 <div class="table-wrap"><table>
 <thead><tr><th>#</th><th>Pendiente</th><th>Por qué importa</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Alinear los precios del contrato con las hojas de red</td><td>El contrato dice "Base Service Fee: $2,500/month per school". Si la hoja de red ofrece $1,500 por campus, el PDF se contradice. Es texto legal: hay que decidir cómo se parametriza.</td></tr>
+<tr><td>1</td><td>Aprobar la redacción del contrato para tratos de red</td><td>Ya está construida (sección 6), pero es texto legal: alguien debe aprobar las 4 frases antes de usarla con un cliente.</td></tr>
 <tr><td>2</td><td>Definir y aprobar las frases de campus único</td><td>Hoy solo cambian 2 frases. El resto del PDF dice red, y el cliente lo ve.</td></tr>
 <tr><td>3</td><td>Detectar texto encima de las fotos del sitio</td><td>El filtro por nombre de archivo atrapa portadas de blog, pero no un gráfico con nombre normal.</td></tr>
 <tr><td>4</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>

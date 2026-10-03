@@ -3,9 +3,10 @@ import { Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 import { color, space } from "../theme";
 import {
   buildAgreementSections,
-  EXHIBIT_A,
+  exhibitA,
+  exhibitC,
+  type NetworkFee,
   EXHIBIT_B,
-  EXHIBIT_C,
   EXHIBIT_D,
 } from "../agreementContent";
 
@@ -58,8 +59,10 @@ const s = StyleSheet.create({
   sigLine: { borderTopWidth: 1, borderTopColor: "#26263a", marginTop: 18, paddingTop: 4, fontSize: 8.5, color: color.muted },
 });
 
-export function AgreementPage({ schoolName, possessive }: { schoolName: string; possessive: string }) {
-  const sections = buildAgreementSections(schoolName, possessive);
+export function AgreementPage({ schoolName, possessive, fee }: { schoolName: string; possessive: string; fee?: NetworkFee }) {
+  const sections = buildAgreementSections(schoolName, possessive, fee);
+  const EXHIBIT_A = exhibitA(fee);
+  const EXHIBIT_C = exhibitC(fee);
 
   return (
     <Page size="LETTER" style={s.page} wrap>

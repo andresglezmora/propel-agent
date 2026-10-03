@@ -48,6 +48,9 @@ todas las recetas y módulos, y qué contenido acepta cada uno.
    - Si piden que lo redactes tú, o hace falta texto que nadie dio, puedes
      proponerlo con `source: "ai"`, dentro de los límites del módulo.
    - Las cifras se piden al equipo antes de seguir. Sin ellas no se renderiza.
+   - Con hojas de red, el contrato usa el precio de la opción recomendada
+     (precio por campus, número de campus y total). Si dan varias opciones y
+     no dicen cuál se recomienda, pregúntalo: es el precio que se firma.
 5. `harvest_site_photos` para ver qué fotos tiene el sitio. Usa el skill
    `photo-selection` para decidir, espacio por espacio, si una candidata del
    sitio sirve o si toca generar con IA:

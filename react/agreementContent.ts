@@ -15,7 +15,11 @@ export type Block =
 
 export type Section = { number: string; heading: string; blocks: Block[] };
 
-export function buildAgreementSections(schoolName: string, possessive: string): Section[] {
+/** Precio de un trato de red (la opción recomendada de network-pricing). Sin
+ * él, el contrato usa la tarifa estándar de $2,500 por escuela. */
+export type NetworkFee = { pricePerCampus: string; campuses: number; total: string };
+
+export function buildAgreementSections(schoolName: string, possessive: string, fee?: NetworkFee): Section[] {
   return [
     {
       number: "1",
@@ -64,7 +68,9 @@ export function buildAgreementSections(schoolName: string, possessive: string): 
       blocks: [
         {
           type: "p",
-          text: "TrustED will deliver a Full Service Enrollment Bundle tailored to $2,500 per month per school. This scope is typically designed to meet the needs of a single-campus engagement, with a defined monthly time allocation across strategy, creative, CRM, and enrollment support.",
+          text: fee
+            ? `TrustED will deliver a Full Service Enrollment Bundle across ${fee.campuses} participating campuses at ${fee.pricePerCampus} per campus per month (${fee.total} per month in total), as set out in the pricing of this proposal. Each campus receives a defined monthly time allocation across strategy, creative, CRM, and enrollment support.`
+            : "TrustED will deliver a Full Service Enrollment Bundle tailored to $2,500 per month per school. This scope is typically designed to meet the needs of a single-campus engagement, with a defined monthly time allocation across strategy, creative, CRM, and enrollment support.",
         },
         {
           type: "p",
@@ -80,7 +86,13 @@ export function buildAgreementSections(schoolName: string, possessive: string): 
       number: "4",
       heading: "Fees & Invoicing",
       blocks: [
-        { type: "kv", label: "Base Service Fee:", text: "$2,500/month per school." },
+        {
+          type: "kv",
+          label: "Base Service Fee:",
+          text: fee
+            ? `${fee.pricePerCampus}/month per campus for ${fee.campuses} participating campuses (${fee.total}/month in total). Changes to the number of participating campuses require a written pricing adjustment.`
+            : "$2,500/month per school.",
+        },
         { type: "kv", label: "Parent Outreach (variable):", text: "Per Section 5." },
         {
           type: "kv",
@@ -225,6 +237,22 @@ export function buildAgreementSections(schoolName: string, possessive: string): 
     },
   ];
 }
+
+export const exhibitA = (fee?: NetworkFee) => ({
+  ...EXHIBIT_A,
+  sub: fee
+    ? `Full Service Support — ${fee.pricePerCampus}/mo per campus · ${fee.campuses} campuses`
+    : EXHIBIT_A.sub,
+});
+
+export const exhibitC = (fee?: NetworkFee) => ({
+  ...EXHIBIT_C,
+  items: EXHIBIT_C.items.map((it) =>
+    fee && it.label === "Base Fee:"
+      ? { ...it, text: `${fee.total}/month (in advance): ${fee.campuses} participating campuses at ${fee.pricePerCampus}/month per campus.` }
+      : it,
+  ),
+});
 
 export const EXHIBIT_A = {
   heading: "Exhibit A — Scope of Services",
