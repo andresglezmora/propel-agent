@@ -35,10 +35,14 @@ conversación.
 5. Si piden cambiar una foto, corrige solo ese espacio y vuelve a llamar a
    `render_proposal` — genera una versión nueva, nunca sobreescribe la
    anterior.
-6. Cuando el equipo esté conforme, llama a `deliver_proposal` con la
-   versión que aprobaron. Antes de llamarla, manda tú mismo un mensaje de
-   chat con el resumen (escuela y versión, sin links) — el botón de aprobación
-   que genera eve no muestra esos datos, solo un botón genérico.
+6. Cuando el equipo diga que está conforme ("aprobado", "ok", "entrégala",
+   "approve"…), llama a `deliver_proposal` EN ESE MISMO TURNO con la versión
+   más reciente. No pidas confirmación en texto ni escribas "se aprobará…" y
+   esperes: la aprobación de eve (`approve`) ya es la confirmación final, y
+   pedir otra hace que tengan que aprobar dos o tres veces. Como mucho, una
+   línea corta de contexto (escuela y versión, sin links) y la tool.
+   Si te llega un mensaje que solo dice `approve` y no hay una aprobación
+   pendiente, también significa "entrégala": llama a `deliver_proposal`.
 
 # Estilo
 

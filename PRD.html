@@ -6,723 +6,1062 @@
 <title>Propel PRD</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400..500&family=Inter+Tight:wght@400;500&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:            #ffffff;
-    --bg-subtle:     #fafafa;
-    --bg-inset:      #f4f4f5;
-    --border:        #eaeaea;
-    --border-strong: #d4d4d4;
-    --fg:            #0a0a0a;
-    --fg-muted:      #666666;
-    --fg-subtle:     #8f8f8f;
-    --accent:        #0a0a0a;
-    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.04);
-    --radius: 8px;
-    --maxw: 760px;
-    --font: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  }
+:root {
+  --paper:#f7f6f3; --white:#ffffff; --panel:#ecebe6;
+  --ink:#121212; --muted:#6c6a66; --faint:#97948e; --rule:#dedbd4;
+  --blue:#2326e6; --blue-soft:#eceeff;
+  /* Fuentes de pago primero: si están instaladas se usan; si no, las libres. */
+  --serif:"STK Bureau Serif","Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:"NB International Pro","Inter Tight",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --nav:236px; --col:800px;
+}
+@media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    @media (prefers-color-scheme: dark) {
-      --bg:#0a0a0a; --bg-subtle:#111111; --bg-inset:#161616;
-      --border:#242424; --border-strong:#343434;
-      --fg:#ededed; --fg-muted:#a1a1a1; --fg-subtle:#7a7a7a; --accent:#ededed;
-      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
-    }
+    --paper:#121211; --white:#1a1a18; --panel:#201f1d;
+    --ink:#ecebe7; --muted:#a4a19b; --faint:#77746e; --rule:#2d2c29;
+    --blue:#8c90ff; --blue-soft:#1f2040;
   }
-  :root[data-theme="dark"] {
-    --bg:#0a0a0a; --bg-subtle:#111111; --bg-inset:#161616;
-    --border:#242424; --border-strong:#343434;
-    --fg:#ededed; --fg-muted:#a1a1a1; --fg-subtle:#7a7a7a; --accent:#ededed;
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
-  }
+}
+* { box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--serif); font-size:15px;
+  line-height:1.55; font-weight:400; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+strong { font-weight:500; }
 
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--font);
-    font-size: 16px;
-    line-height: 1.65;
-    letter-spacing: -0.011em;
-    -webkit-font-smoothing: antialiased;
-  }
+.layout { display:grid; grid-template-columns: var(--nav) minmax(0,1fr); min-height:100vh; max-width:1180px; margin:0 auto; }
 
-  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px 120px; }
+/* navegación izquierda */
+aside.side { position:sticky; top:0; height:100vh; overflow-y:auto; padding:48px 20px 32px 40px; font-family:var(--sans); }
+aside.side .brand { font-size:15px; font-weight:500; letter-spacing:-0.01em; margin:0 0 4px; }
+aside.side .sub { font-family:var(--mono); font-size:10px; color:var(--faint); text-transform:uppercase; letter-spacing:.04em; margin:0 0 28px; }
+aside.side ol { list-style:none; margin:0; padding:0; counter-reset:toc; }
+aside.side li { counter-increment:toc; margin:0; }
+aside.side a { display:flex; gap:10px; padding:4px 0 4px 10px; margin-left:-10px; border-left:2px solid transparent;
+  color:var(--ink); text-decoration:none; font-size:13px; line-height:1.35; }
+aside.side a::before { content:counter(toc, decimal-leading-zero); font-family:var(--mono); font-size:10px; color:var(--faint); min-width:16px; padding-top:2px; }
+aside.side a:hover { color:var(--blue); }
+aside.side a.active { color:var(--blue); border-left-color:var(--blue); }
 
-  /* ── Header ─────────────────────────────────────────── */
-  header.doc {
-    border-bottom: 1px solid var(--border);
-    padding: 72px 0 40px;
-    margin-bottom: 48px;
-  }
-  .eyebrow {
-    font-size: 12px; font-weight: 600; letter-spacing: .08em;
-    text-transform: uppercase; color: var(--fg-subtle); margin: 0 0 16px;
-  }
-  h1 {
-    font-size: clamp(32px, 6vw, 44px); font-weight: 800;
-    letter-spacing: -0.035em; line-height: 1.1; margin: 0 0 16px;
-  }
-  .lede { font-size: 18px; color: var(--fg-muted); margin: 0 0 28px; max-width: 60ch; }
-  /* Metadatos en texto plano. Encapsularlos no los jerarquiza, solo los disfraza. */
-  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px;
-    font-size: 13px; color: var(--fg-muted); margin: 0; }
-  .meta .sep { color: var(--border-strong); }
-  .meta .status { display: inline-flex; align-items: center; gap: 6px;
-    font-weight: 600; color: var(--fg); }
-  .meta .status .dot { width: 6px; height: 6px; border-radius: 50%;
-    background: var(--fg); }
-  /* .pill: SOLO para estado que cambia (aprobado/en revisión), nunca decorativa. */
-  .pill {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 600; padding: 3px 9px;
-    border: 1px solid var(--border); border-radius: 999px;
-    color: var(--fg-muted); background: var(--bg-subtle);
-  }
+/* columna con guías verticales */
+main { padding:0 0 120px; min-width:0; }
+.col { position:relative; max-width:calc(var(--col) + 104px); margin:0; padding:0 40px 0 64px;
+  border-left:1px solid var(--rule); border-right:1px solid var(--rule); }
+.wrap { max-width:var(--col); }
 
-  /* ── Table of contents ──────────────────────────────── */
-  nav.toc {
-    border: 1px solid var(--border); border-radius: var(--radius);
-    background: var(--bg-subtle); padding: 20px 22px; margin: 0 0 56px;
-  }
-  nav.toc p { margin: 0 0 12px; font-size: 12px; font-weight: 700;
-    letter-spacing: .08em; text-transform: uppercase; color: var(--fg-subtle); }
-  nav.toc ol { margin: 0; padding: 0; list-style: none; counter-reset: toc;
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2px 24px; }
-  nav.toc li { counter-increment: toc; }
-  nav.toc a {
-    display: block; padding: 5px 0; color: var(--fg-muted);
-    text-decoration: none; font-size: 14px; font-weight: 500;
-  }
-  nav.toc a::before { content: counter(toc) "."; color: var(--fg-subtle);
-    display: inline-block; width: 22px; font-variant-numeric: tabular-nums; }
-  nav.toc a:hover { color: var(--fg); }
+header.doc { padding:56px 0 28px; margin:0 0 40px; }
+.hero { font-family:var(--sans); font-weight:500; font-size:clamp(30px,5vw,40px); letter-spacing:-0.03em; line-height:1.08; margin:0 0 18px; max-width:22ch; }
+.lede { font-size:15px; color:var(--ink); margin:0 0 22px; max-width:58ch; }
+.meta { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:var(--mono); font-size:11px; color:var(--muted);
+  margin:0; padding:10px 0 0; border-top:1px solid var(--rule); }
+.meta .status::before { content:""; display:inline-block; width:6px; height:6px; background:var(--blue); border-radius:50%; margin-right:8px; }
 
-  /* ── Sections ───────────────────────────────────────── */
-  section { margin: 0 0 64px; scroll-margin-top: 24px; }
-  h2 {
-    font-size: 24px; font-weight: 700; letter-spacing: -0.025em;
-    margin: 0 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
-  }
-  h3 { font-size: 17px; font-weight: 700; letter-spacing: -0.015em; margin: 32px 0 10px; }
-  h4 { font-size: 15px; font-weight: 700; margin: 24px 0 8px; color: var(--fg-muted); }
-  p { margin: 0 0 16px; }
-  a { color: var(--fg); text-decoration: underline; text-underline-offset: 2px;
-      text-decoration-color: var(--border-strong); }
-  a:hover { text-decoration-color: var(--fg); }
-  strong { font-weight: 700; }
-  ul, ol { margin: 0 0 16px; padding-left: 22px; }
-  li { margin: 0 0 8px; }
-  li::marker { color: var(--fg-subtle); }
-  hr { border: 0; border-top: 1px solid var(--border); margin: 48px 0; }
+section { position:relative; margin:0 0 56px; scroll-margin-top:24px; }
+h2 { font-family:var(--sans); font-weight:500; font-size:20px; letter-spacing:-0.02em; line-height:1.2; margin:0 0 16px; }
+h2 .n { position:absolute; left:-48px; top:5px; font-family:var(--mono); font-weight:400; font-size:10px; letter-spacing:.04em; color:var(--faint); }
+h3 { font-family:var(--sans); font-weight:500; font-size:15px; letter-spacing:-0.01em; margin:28px 0 8px; }
+h4 { font-family:var(--mono); font-weight:400; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:22px 0 8px; }
+p { margin:0 0 14px; max-width:68ch; }
+ul, ol { margin:0 0 14px; padding-left:20px; max-width:68ch; }
+li { margin:0 0 6px; }
+li::marker { color:var(--faint); }
+a { color:var(--blue); text-decoration:underline dotted; text-underline-offset:3px; }
 
-  /* ── Blocks ─────────────────────────────────────────── */
-  blockquote {
-    margin: 0 0 20px; padding: 16px 20px;
-    border-left: 2px solid var(--fg); background: var(--bg-subtle);
-    border-radius: 0 var(--radius) var(--radius) 0; color: var(--fg-muted);
-  }
-  blockquote p:last-child { margin: 0; }
+.callout { background:var(--white); border:1px solid var(--rule); border-left:2px solid var(--blue); padding:14px 16px; margin:0 0 18px; }
+.callout .label { display:block; font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+.callout p:last-child { margin:0; max-width:none; }
+code { font-family:var(--mono); font-size:12px; background:var(--panel); padding:1px 5px; border-radius:2px; }
+pre { font-family:var(--mono); font-size:12px; line-height:1.6; background:var(--white); border:1px solid var(--rule); padding:16px 18px; margin:0 0 18px; overflow-x:auto; color:var(--ink); }
+pre code { background:none; padding:0; font-size:inherit; }
 
-  .callout {
-    border: 1px solid var(--border); border-radius: var(--radius);
-    background: var(--bg-subtle); padding: 16px 18px; margin: 0 0 20px;
-  }
-  .callout .label {
-    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--fg-subtle); display: block; margin-bottom: 6px;
-  }
-  .callout p:last-child { margin: 0; }
+.table-wrap { overflow-x:auto; margin:0 0 18px; border:1px solid var(--rule); background:var(--white); }
+table { width:100%; border-collapse:collapse; font-family:var(--sans); font-size:13px; line-height:1.45; }
+th { text-align:left; font-family:var(--mono); font-weight:400; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint);
+  padding:10px 14px; border-bottom:1px solid var(--rule); white-space:nowrap; }
+td { padding:10px 14px; border-bottom:1px solid var(--rule); vertical-align:top; }
+tbody tr:last-child td { border-bottom:0; }
+td code { font-size:11.5px; }
 
-  code {
-    font-family: var(--mono); font-size: .875em;
-    background: var(--bg-inset); border: 1px solid var(--border);
-    border-radius: 4px; padding: 1px 5px;
-  }
-  pre {
-    font-family: var(--mono); font-size: 13px; line-height: 1.6;
-    background: var(--bg-subtle); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 18px 20px; margin: 0 0 20px;
-    overflow-x: auto; color: var(--fg-muted);
-  }
-  pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+.grid { display:grid; gap:14px; margin:0 0 18px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); }
+.card { background:var(--white); border:1px solid var(--rule); padding:16px 18px; }
+.card h3 { margin:0 0 10px; font-size:13px; }
+.card ul { margin:0; padding-left:18px; font-size:14px; color:var(--muted); }
 
-  /* ── Tables ─────────────────────────────────────────── */
-  .table-wrap { overflow-x: auto; margin: 0 0 20px;
-    border: 1px solid var(--border); border-radius: var(--radius); }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th {
-    text-align: left; font-weight: 600; font-size: 12px; letter-spacing: .04em;
-    text-transform: uppercase; color: var(--fg-subtle);
-    background: var(--bg-subtle); padding: 10px 16px;
-    border-bottom: 1px solid var(--border); white-space: nowrap;
-  }
-  td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  tbody tr:last-child td { border-bottom: 0; }
+/* diagramas */
+figure.diagram { margin:24px 0; }
+.canvas { overflow-x:auto; background:var(--panel); border:1px solid var(--rule); }
+.canvas svg { display:block; width:100%; height:auto; font-family:var(--sans); }
+figcaption { font-family:var(--mono); font-size:11px; color:var(--faint); margin-top:8px; }
+.edge { fill:none; stroke:var(--ink); stroke-width:1.2; }
+.edge.dashed { stroke-dasharray:4 3; }
+.arrow { fill:none; stroke:var(--ink); stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+.node .box { fill:var(--white); stroke:var(--ink); stroke-width:1; }
+.node.dashed .box { stroke-dasharray:4 3; stroke:var(--muted); }
+.node.human .box { fill:var(--blue-soft); stroke:var(--blue); }
+.node.inv .box { fill:var(--ink); }
+.node .kind { font-family:var(--mono); font-size:10px; letter-spacing:.06em; fill:var(--muted); }
+.node .title { font-size:13px; font-weight:500; fill:var(--ink); letter-spacing:-0.005em; }
+.node .cap { font-size:12px; fill:var(--muted); }
+.node.inv .title { fill:var(--paper); }
+.node.inv .cap { fill:var(--paper); opacity:.75; }
+.elabel { font-family:var(--mono); font-size:11px; fill:var(--ink); paint-order:stroke; stroke:var(--panel); stroke-width:5px; stroke-linejoin:round; }
 
-  /* ── Scope grid (dentro / fuera) ────────────────────── */
-  .grid { display: grid; gap: 16px; margin: 0 0 20px;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  .card {
-    border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 18px 20px; background: var(--bg);
-  }
-  .card h3 { margin: 0 0 12px; font-size: 14px; }
-  .card ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--fg-muted); }
+footer.doc { border-top:1px solid var(--rule); padding-top:20px; margin-top:24px; font-family:var(--mono); font-size:11px; color:var(--faint); }
 
-  footer.doc {
-    border-top: 1px solid var(--border); padding-top: 24px; margin-top: 72px;
-    font-size: 13px; color: var(--fg-subtle);
-  }
-
-  @media (max-width: 640px) {
-    header.doc { padding-top: 48px; }
-    nav.toc ol { grid-template-columns: 1fr; }
-  }
-  @media print {
-    :root { --bg:#fff; --fg:#000; }
-    nav.toc { break-inside: avoid; }
-    section { break-inside: auto; }
-    h2 { break-after: avoid; }
-  }
+@media (max-width:900px) {
+  .layout { display:block; }
+  aside.side { position:static; height:auto; padding:24px 16px 8px; }
+  aside.side ol { columns:2; column-gap:20px; }
+  .col { border:0; padding:0 16px; }
+  h2 .n { position:static; margin-right:10px; }
+  header.doc { padding-top:24px; }
+}
+@media (max-width:520px) { aside.side ol { columns:1; } }
+@media print {
+  :root { --paper:#fff; }
+  aside.side { display:none; }
+  .layout { display:block; }
+  .col { border:0; padding:0; }
+  figure.diagram { break-inside:avoid; }
+  h2 { break-after:avoid; }
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-
+<div class="layout">
+<aside class="side">
+  <p class="brand">Propel</p>
+  <p class="sub">PRD · TrustED Solutions</p>
+  <nav><ol>
+<li><a href="#resumen">Qué es Propel</a></li>
+<li><a href="#problema">Problema y objetivo</a></li>
+<li><a href="#cambia">Qué cambia en cada propuesta</a></li>
+<li><a href="#alcance">Alcance</a></li>
+<li><a href="#flujo">Flujo de una propuesta</a></li>
+<li><a href="#fotos">Fotos</a></li>
+<li><a href="#aprobacion">Aprobación y entrega</a></li>
+<li><a href="#arquitectura">Arquitectura</a></li>
+<li><a href="#pdf">Cómo se genera el PDF</a></li>
+<li><a href="#datos">Datos</a></li>
+<li><a href="#tools">Tools del agente</a></li>
+<li><a href="#canales">Canales</a></li>
+<li><a href="#decisiones">Decisiones y por qué</a></li>
+<li><a href="#seguridad">Seguridad y límites</a></li>
+<li><a href="#costos">Costos y rendimiento</a></li>
+<li><a href="#pendientes">Pendientes por prioridad</a></li>
+<li><a href="#repo">Repo y cómo correrlo</a></li>
+<li><a href="#glosario">Glosario</a></li>
+  </ol></nav>
+</aside>
+<main><div class="col"><div class="wrap">
 <header class="doc">
-  <p class="eyebrow">PRD · Agente eve · TrustED Solutions</p>
-  <h1>Propel</h1>
-  <p class="lede">Un agente que recibe el nombre y el sitio web de una escuela y devuelve, en minutos, la propuesta Full-Service de TrustED en PDF. Mismo contenido y mismo diseño que la plantilla de Canva. Solo cambian el nombre, la fecha, tres fotos y, si la escuela tiene un solo campus, las frases que hablan de red.</p>
-  <p class="meta">
-    <span class="status"><span class="dot"></span>Aprobado para construir</span>
-    <span class="sep">·</span> 28 de septiembre de 2026
-    <span class="sep">·</span> TrustED Solutions
-  </p>
+  <h1 class="hero">Propel genera la propuesta Full-Service en PDF.</h1>
+  <p class="lede">Le das el nombre de una escuela, su sitio web y si es un campus o una red. Propel busca las fotos, arma el PDF y una persona lo aprueba antes de entregarlo.</p>
+  <p class="meta"><span>Por Andrés Mora</span><span class="status">V1 funcionando</span><span>03.10.26</span></p>
 </header>
-
-<nav class="toc">
-  <p>Contenido</p>
-  <ol>
-    <li><a href="#s1">Problema y objetivo</a></li>
-    <li><a href="#s2">Anatomía de la plantilla</a></li>
-    <li><a href="#s3">Alcance</a></li>
-    <li><a href="#s4">Stack</a></li>
-    <li><a href="#s5">Plantilla y render del PDF</a></li>
-    <li><a href="#s6">Diseño del agente</a></li>
-    <li><a href="#s7">Fotos</a></li>
-    <li><a href="#s8">Datos: Supabase compartido</a></li>
-    <li><a href="#s9">Tools, canales e integraciones</a></li>
-    <li><a href="#s10">Criterios de aceptación y evals</a></li>
-    <li><a href="#s11">Riesgos y mitigaciones</a></li>
-    <li><a href="#s12">Roadmap</a></li>
-    <li><a href="#s13">Estructura del repo</a></li>
-    <li><a href="#s14">Pendientes</a></li>
-  </ol>
-</nav>
-
-<section id="s1">
-  <h2>1. Problema y objetivo</h2>
-  <p>Cuando un lead ya es cliente potencial, el equipo le manda la propuesta Full-Service. Hoy eso se hace a mano en Canva: duplicar el diseño, reemplazar el nombre de la escuela, buscar fotos en su sitio o generarlas con IA, acomodarlas y exportar a PDF. Cada propuesta cuesta tiempo de una persona y las ediciones a mano dejan errores (en la versión de PROUD Academy hay varios, ver sección 2).</p>
-  <p><strong>Objetivo:</strong> que alguien del equipo escriba en Telegram el nombre, el sitio y si la escuela es de un campus o una red, y reciba el PDF listo para enviar, fiel a la plantilla, sin abrir Canva.</p>
-
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Métrica</th><th>Hoy</th><th>Meta V1</th></tr></thead>
-      <tbody>
-        <tr><td>Tiempo desde la solicitud hasta la vista previa</td><td>Por medir (estimado 30 a 60 min)</td><td>Menos de 5 min</td></tr>
-        <tr><td>Propuestas aprobadas sin cambios manuales</td><td>0 (todas son manuales)</td><td>9 de cada 10</td></tr>
-        <tr><td>Errores de nombre o texto en el PDF</td><td>Varios por propuesta</td><td>0, verificado en código antes de entregar</td></tr>
-        <tr><td>Costo por propuesta</td><td>Horas de diseño</td><td>Menos de US$1 en modelo, scraping e imágenes</td></tr>
-      </tbody>
-    </table>
-  </div>
+<section id="resumen"><h2><span class="n">01</span>Qué es Propel</h2>
+<p>Propel es un agente que genera la propuesta comercial <strong>TrustED Full-Service</strong> en PDF. Le dices el nombre de la escuela, su sitio web y si es un campus o una red de campus. Propel busca las fotos, arma el PDF de 19 páginas y lo manda al chat para que una persona lo revise y lo apruebe.</p>
+<p>Está hecho con <strong>eve</strong>, el framework de Vercel para agentes: un agente es una carpeta de archivos (instrucciones, tools, canales, skills) que eve compila y despliega. Vive en Vercel y se usa por Telegram y por un canal de Scale CRM.</p>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 207" style="min-width:700px" role="img" aria-label="Diagrama 1. Lo que hace Propel, de punta a punta.">
+<defs><marker id="arr-overview" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 188.0 93.5 L 212.0 93.5" class="edge" marker-end="url(#arr-overview)"/>
+<path d="M 388.0 93.5 L 396.0 93.5 Q 400.0 93.5 400.0 89.5 L 400.0 89.5 Q 400.0 85.5 404.0 85.5 L 412.0 85.5" class="edge" marker-end="url(#arr-overview)"/>
+<path d="M 588.0 85.5 L 612.0 85.5" class="edge" marker-end="url(#arr-overview)"/>
+<path d="M 500.0 129.0 L 500.0 178.0 Q 500.0 185.0 493.0 185.0 L 307.0 185.0 Q 300.0 185.0 300.0 178.0 L 300.0 145.0" class="edge" marker-end="url(#arr-overview)"/>
+<g class="node ">
+<text class="kind" x="12.0" y="33.0">ENTRADA</text>
+<rect class="box" x="12.0" y="42.0" width="176" height="103.0" rx="3"/>
+<text class="title" x="26.0" y="66.0">Pedido</text>
+<text class="cap" x="26.0" y="82.0">Nombre de la escuela,</text>
+<text class="cap" x="26.0" y="98.0">sitio web y si es un</text>
+<text class="cap" x="26.0" y="114.0">campus o una red.</text>
+</g>
+<g class="node ">
+<text class="kind" x="212.0" y="33.0">AGENTE</text>
+<rect class="box" x="212.0" y="42.0" width="176" height="103.0" rx="3"/>
+<text class="title" x="226.0" y="66.0">Propel</text>
+<text class="cap" x="226.0" y="82.0">Busca fotos en el sitio</text>
+<text class="cap" x="226.0" y="98.0">y arma el PDF de 19</text>
+<text class="cap" x="226.0" y="114.0">páginas.</text>
+</g>
+<g class="node human">
+<text class="kind" x="412.0" y="33.0">PERSONA</text>
+<rect class="box" x="412.0" y="42.0" width="176" height="87.0" rx="3"/>
+<text class="title" x="426.0" y="66.0">Revisión</text>
+<text class="cap" x="426.0" y="82.0">Ve el PDF, pide cambios</text>
+<text class="cap" x="426.0" y="98.0">o aprueba.</text>
+</g>
+<g class="node ">
+<text class="kind" x="612.0" y="33.0">SALIDA</text>
+<rect class="box" x="612.0" y="42.0" width="176" height="87.0" rx="3"/>
+<text class="title" x="626.0" y="66.0">Entrega</text>
+<text class="cap" x="626.0" y="82.0">Proposal - Escuela.pdf y</text>
+<text class="cap" x="626.0" y="98.0">un link de 30 días.</text>
+</g>
+<text class="elabel" x="400.0" y="189.0" text-anchor="middle">cambios</text>
+</svg></div>
+<figcaption>Diagrama 1. Lo que hace Propel, de punta a punta.</figcaption></figure>
+<p>En la prueba con Aspire Public Schools pasaron unos 40 segundos entre el mensaje y el PDF de preview.</p>
 </section>
-
-<section id="s2">
-  <h2>2. Anatomía de la plantilla</h2>
-  <p>Base: <code>Proposal - PROUD Academy.pdf</code>, exportado de Canva. 21 páginas tamaño carta (612 × 792 pt). Se divide en la propuesta (páginas 1 a 13) y el Service Agreement (14 a 21).</p>
-
-  <h3>Qué cambia por escuela</h3>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Variable</th><th>Dónde</th><th>Notas</th></tr></thead>
-      <tbody>
-        <tr><td>Nombre de la escuela</td><td>38 coincidencias en 12 páginas: 1, 2, 3, 4, 10, 11, 15 a 19 y 21</td><td>Algunas son capas duplicadas del mismo título. Se usan variantes del nombre (ver abajo).</td></tr>
-        <tr><td>Fecha</td><td>Portada, "Date:"</td><td>El día en que se genera, en formato <code>September 28, 2026</code>.</td></tr>
-        <tr><td>Modo campus</td><td>Portada y frases de red en el texto</td><td><code>network</code> deja la plantilla como está. <code>single</code> quita "Network-wide" de la portada y usa la versión de un solo campus de cada frase de red.</td></tr>
-        <tr><td>Foto de portada</td><td>Página 1, recorte con forma curva</td><td>La foto más importante del documento: lleva la mejor candidata.</td></tr>
-        <tr><td>Foto "Our Mission"</td><td>Página 2, columna derecha</td><td>Vertical, idealmente docente con alumnos.</td></tr>
-        <tr><td>Foto "Testimonials"</td><td>Página 13, franja inferior</td><td>Horizontal, escena de aula.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Todo lo demás es fijo: la foto de la página 4, las fotos de TrustED de las páginas 6, 8 y 11, las piezas de Aspire de la página 10, las capturas del CRM, la tabla de precios y los testimonios de la página 13 con sus datos de contacto.</p>
-
-  <h3>Variantes del nombre</h3>
-  <p>El reemplazo a mano dejó errores de gramática en la versión de PROUD. Propel guarda estas variantes por escuela y la plantilla usa cada una donde corresponde:</p>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Variante</th><th>Ejemplo</th><th>Uso</th></tr></thead>
-      <tbody>
-        <tr><td><code>name</code></td><td>PROUD Academy</td><td>Portada, sujeto de las oraciones</td></tr>
-        <tr><td><code>possessive</code></td><td>PROUD Academy's</td><td>"PROUD Academy's central team", "PROUD Academy's IP"</td></tr>
-        <tr><td><code>shortName</code></td><td>PROUD</td><td>Opcional, para frases que se leen largas con el nombre completo</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h3>Errores de la plantilla actual</h3>
-  <p>Se corrigen una sola vez al pasar la plantilla a HTML:</p>
-  <ul>
-    <li>Página 1: "Sept 25h, 2026".</li>
-    <li>Página 2: "PROUD Academy gain" (debe ser "gains").</li>
-    <li>Página 3: "PROUD Academy' central team" (posesivo mal formado).</li>
-    <li>Página 5: "$2,500K/mo" (debe ser $2,500/mo) y "Fundrasisng".</li>
-    <li>Página 11: "Every PROUD Academy gets" (quedó de "Every school").</li>
-    <li>Página 15: el párrafo de "Parties &amp; Purpose" está duplicado casi igual.</li>
-    <li>Página 18: "PROUD AcademyIP".</li>
-    <li>Página 21: "netwroks" e "Invoice Terms: Invoice Terms:".</li>
-  </ul>
+<section id="problema"><h2><span class="n">02</span>Problema y objetivo</h2>
+<h3>Problema</h3>
+<p>La propuesta se armaba a mano en Canva: duplicar la plantilla, cambiar el nombre de la escuela en cada página donde aparece, buscar tres fotos y exportar. Es lento y es fácil dejar un nombre viejo en alguna página.</p>
+<h3>Objetivo</h3>
+<p>Dar nombre, sitio web y modalidad, y recibir un PDF idéntico a la plantilla, sin tocar el diseño ni el texto.</p>
+<h3>Cómo sabemos que funciona</h3>
+<ul>
+<li>El PDF tiene las 19 páginas de la plantilla y solo cambia lo que lista la sección 3.</li>
+<li>Pesa menos de 8 MB. Si pasa, el render se bloquea.</li>
+<li>Ninguna propuesta se entrega sin que una persona la apruebe.</li>
+<li>Del mensaje al preview pasa menos de un minuto. Medido: 15:03:42 el mensaje, 15:04:21 el PDF.</li>
+</ul>
+<div class="callout"><span class="label">Regla central</span><p>Propel nunca reescribe el texto de la propuesta. Solo rellena los campos que cambian entre escuelas.</p></div>
 </section>
-
-<section id="s3">
-  <h2>3. Alcance</h2>
-  <div class="grid">
-    <div class="card">
-      <h3>Dentro de V1</h3>
-      <ul>
-        <li>Solicitud por Telegram (chat privado) con nombre, URL y modo campus.</li>
-        <li>Plantilla Full-Service en HTML, fiel al PDF de Canva, con sus dos variantes (red y un campus).</li>
-        <li>Nombre con variantes y fecha del día.</li>
-        <li>Tres fotos: del sitio de la escuela y, si no hay, generadas con IA.</li>
-        <li>Vista previa en PDF completo, con cambios por texto libre o foto subida.</li>
-        <li>Entrega del mismo PDF aprobado, en el chat y con link firmado de 30 días.</li>
-        <li>Validación automática antes de mandar cualquier PDF.</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>Fuera de V1</h3>
-      <ul>
-        <li>Integración con Scale CRM (fase 3, se coordina con ambos lados).</li>
-        <li>Otras plantillas (EnrollED, respuestas a RFP).</li>
-        <li>Cambiar precios, paquetes o textos por escuela.</li>
-        <li>Nombre del contacto o firma prellenada.</li>
-        <li>Envío automático al cliente por correo.</li>
-      </ul>
-    </div>
-  </div>
-  <div class="callout">
-    <span class="label">Explícitamente no</span>
-    <p>Propel no redacta ni reescribe texto de la propuesta. Las dos variantes del texto (red y un campus) se aprueban una vez en la fase 0 y quedan fijas en la plantilla. El modelo solo decide las variantes del nombre y qué foto va en cada espacio. El resto es código determinístico.</p>
-  </div>
-  <div class="callout">
-    <span class="label">Tampoco se construye</span>
-    <p>Una Web UI propia de Propel. Después de Telegram, la interfaz será Scale CRM.</p>
-  </div>
+<section id="cambia"><h2><span class="n">03</span>Qué cambia en cada propuesta</h2>
+<p>Todo el PDF es fijo menos esto:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Campo</th><th>Dónde aparece</th><th>De dónde sale</th></tr></thead>
+<tbody>
+<tr><td>Nombre de la escuela</td><td>Portada, misión, partner, dashboards, marketing, CMO y acuerdo</td><td>Lo escribe la persona. Propel deriva el posesivo (Aspire's, Jones') y una forma corta opcional.</td></tr>
+<tr><td>Fecha</td><td>Portada</td><td>El día en que se genera el PDF.</td></tr>
+<tr><td>Foto de portada</td><td>Página 1</td><td>Sitio de la escuela, o IA si el sitio no sirve.</td></tr>
+<tr><td>Foto de misión</td><td>Página 2</td><td>Igual.</td></tr>
+<tr><td>Foto de Centralized Enrollment</td><td>Página 4</td><td>Igual.</td></tr>
+<tr><td>Campus único</td><td>Portada y página 3</td><td>Se quita "Network-wide" de la portada y " across all campuses" de la página 3.</td></tr>
+</tbody></table></div>
+<div class="callout"><span class="label">Pendiente</span><p>Hoy solo se adaptan esas dos frases para un campus único. El resto del PDF habla de red. La lista completa de frases por cambiar falta definirla y aprobarla (sección 16).</p></div>
 </section>
-
-<section id="s4">
-  <h2>4. Stack</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Capa</th><th>Decisión</th><th>Notas</th></tr></thead>
-      <tbody>
-        <tr><td>Framework</td><td>eve 0.67</td><td>Scaffold ya creado en <code>proposal-creator/</code></td></tr>
-        <tr><td>Repo</td><td><code>github.com/andresglezmora/propel-agent</code></td><td>Remote <code>origin</code> configurado. Llave SSH de trusted-scale.</td></tr>
-        <tr><td>Hosting</td><td>Vercel, mismo team que LandingPilot</td><td>Deploy automático desde GitHub</td></tr>
-        <tr><td>Modelo</td><td>AI Gateway de Vercel</td><td>El modelo por default se elige con evals en la fase 1. Candidatos: <code>openai/gpt-5.6-terra</code> y <code>anthropic/claude-sonnet-5</code>, más una opción barata.</td></tr>
-        <tr><td>Imágenes IA</td><td><code>gpt-image-2</code> por el Gateway</td><td>Estilo fotográfico de LandingPilot</td></tr>
-        <tr><td>Scraping</td><td>Firecrawl</td><td>Se reusa <code>harvestSite</code> de LandingPilot</td></tr>
-        <tr><td>Plantilla</td><td>HTML/CSS en el repo</td><td>Manrope e Inter de Google Fonts, iconos Phosphor, logos de <code>brand/</code></td></tr>
-        <tr><td>PDF</td><td><code>@sparticuz/chromium</code> + <code>puppeteer-core</code></td><td>Dentro de la función de Vercel</td></tr>
-        <tr><td>Datos y archivos</td><td>Supabase, compartido con LandingPilot</td><td>Schema <code>propel</code> y bucket propio (sección 8)</td></tr>
-        <tr><td>Canal V1</td><td>Telegram, chat privado</td><td>Lista de chats permitidos, fail-closed (ya implementado)</td></tr>
-        <tr><td>Canal V2</td><td>Scale CRM</td><td>Mismo contrato de webhooks que LandingPilot</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section id="s5">
-  <h2>5. Plantilla y render del PDF</h2>
-  <p>Se evaluaron tres caminos. Se eligió reconstruir la plantilla en HTML: da control total, se versiona en git, no depende de licencias y permite validar el resultado. Canva Autofill requiere Enterprise y no resuelve variantes ni validación. Editar el PDF exportado se descartó porque Canva incrusta solo los glifos que usa cada texto y los títulos tienen capas duplicadas.</p>
-  <p>La plantilla HTML pasa a ser la única versión maestra de la propuesta. Los cambios de diseño se hacen en el repo, ya no en Canva.</p>
-
-  <h3>Sistema visual (sacado del PDF)</h3>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Token</th><th>Valor</th><th>Uso</th></tr></thead>
-      <tbody>
-        <tr><td><code>--purple</code></td><td>#3E2A6A</td><td>Texto principal, fondos oscuros</td></tr>
-        <tr><td><code>--coral</code></td><td>#F63D21</td><td>Acentos y palabras destacadas de los títulos</td></tr>
-        <tr><td><code>--gradient</code></td><td>#FF3400 → #CC74F7</td><td>Barras inferiores y separadores</td></tr>
-        <tr><td><code>--green</code></td><td>#00BE62</td><td>Checks de la tabla de precios</td></tr>
-        <tr><td><code>--lavender</code></td><td>#E4DFEB</td><td>Fondo de tarjetas</td></tr>
-        <tr><td><code>--navy</code></td><td>#020D1F</td><td>Bandas oscuras (páginas 5 y 8)</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Elemento</th><th>Tipografía</th></tr></thead>
-      <tbody>
-        <tr><td>Títulos y encabezados</td><td>Manrope Bold y ExtraBold, como en el PDF</td></tr>
-        <tr><td>Cuerpo de la propuesta (páginas 1 a 13)</td><td>Manrope Regular</td></tr>
-        <tr><td>Cuerpo del Agreement (páginas 15 a 21)</td><td>Inter Regular y Bold</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Tamaños, interlineado y espaciado se ajustan en la fase 0 comparando página por página contra el PDF original.</p>
-
-  <h3>Assets</h3>
-  <ul>
-    <li><strong>Logos:</strong> <code>brand/trusted-logo-dark.png</code> (1698 px) y <code>brand/trusted-logo-white.png</code> (1957 px), PNG transparentes. Sustituyen las copias de 432 px del PDF.</li>
-    <li><strong>Iconos:</strong> Phosphor, peso regular, uno por cada icono vectorial de Canva (páginas 3, 4, 6, 8 y 12). La tabla de correspondencia se aprueba en la fase 0.</li>
-    <li><strong>Imágenes fijas:</strong> se extraen del PDF de Canva (64 imágenes incrustadas: fotos de TrustED, capturas del CRM, piezas de Aspire, logos de los testimonios).</li>
-  </ul>
-
-  <h3>Cómo se arma</h3>
-  <ul>
-    <li>Cada página es un <code>&lt;section class="page"&gt;</code> de 8.5 × 11 in con <code>@page { size: letter; margin: 0 }</code>.</li>
-    <li>Variables: <code>{{school.name}}</code>, <code>{{school.possessive}}</code>, <code>{{date}}</code>, <code>{{photo.cover}}</code>, <code>{{photo.mission}}</code>, <code>{{photo.testimonials}}</code>.</li>
-    <li>Las frases de red se marcan en la plantilla como bloques con dos versiones, por ejemplo <code>&lt;span data-campus="network"&gt;</code> y <code>&lt;span data-campus="single"&gt;</code>. El render deja solo la que corresponde.</li>
-    <li>Si falta alguna variable, el render falla y no produce PDF.</li>
-    <li>Las fotos se recortan al tamaño del espacio y se comprimen antes del render, para que el PDF quede entre 3 y 5 MB.</li>
-  </ul>
-</section>
-
-<section id="s6">
-  <h2>6. Diseño del agente</h2>
-  <h3>Identidad</h3>
-  <blockquote>
-    <p>Eres Propel, el agente de TrustED que prepara propuestas Full-Service. Recibes el nombre, el sitio y el modo campus de una escuela, consigues las mejores fotos disponibles y entregas el PDF. La portada siempre lleva la mejor foto. Nunca cambias el texto de la propuesta. Hablas con el equipo en español, breve y concreto.</p>
-  </blockquote>
-
-  <h3>Flujo</h3>
-  <pre>Telegram: "PROUD Academy, https://proudacademy.org, red"
-   │
-   ├─ 1. start_proposal       crea el registro, fecha y variantes del nombre.
-   │                          Si falta el modo campus o el nombre es ambiguo, pregunta.
-   ├─ 2. harvest_site_photos  Firecrawl sobre el sitio, candidatas verificadas
-   ├─ 3. rank_photos          modelo con visión: asigna una foto a cada espacio,
-   │                          empezando por la portada
-   ├─ 4. generate_ai_photo    solo para los espacios sin candidata útil
-   ├─ 5. render_proposal      HTML → PDF → validación → vista previa al chat
-   │
-   │   El equipo responde:
-   │   • "en la portada usa una del gym"  → set_slot_photo → vuelve a 5
-   │   • sube una foto: "esta va en la 2" → set_slot_photo → vuelve a 5
-   │   • [Aprobar]
-   │
-   └─ 6. deliver_proposal     marca la versión aprobada como final (el mismo archivo),
-                              manda el PDF y un link firmado de 30 días</pre>
-
-  <h3>Estados</h3>
-  <pre>received → harvesting → rendering → awaiting_approval → delivered
-                             ▲               │
-                             └── changes ────┘
-cualquiera → failed   (con motivo legible en el chat)</pre>
-
-  <h3>Qué hace el modelo y qué hace el código</h3>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Modelo</th><th>Código</th></tr></thead>
-      <tbody>
-        <tr><td>Variantes del nombre y cuándo preguntar</td><td>Reemplazo de variables y bloques de campus</td></tr>
-        <tr><td>Elegir la foto para cada espacio</td><td>Recorte, redimensión y compresión</td></tr>
-        <tr><td>Escribir el prompt de la imagen IA</td><td>Render, validación y subida</td></tr>
-        <tr><td>Entender los cambios pedidos en texto libre</td><td>Estados, versiones, tope de imágenes y entrega</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section id="s7">
-  <h2>7. Fotos</h2>
-  <h3>Orden de búsqueda por espacio</h3>
-  <ol>
-    <li><strong>Sitio de la escuela.</strong> <code>harvestSite</code> de LandingPilot (img, srcset, og:image, fondos CSS) con sus filtros de iconos y decorativos. Mínimo 1200 px en el lado largo para la portada y 800 px para las otras dos.</li>
-    <li><strong>Imagen IA.</strong> <code>gpt-image-2</code>, solo si el sitio no tiene una candidata útil para ese espacio.</li>
-  </ol>
-  <p>No se usa stock. Cada foto guarda su origen (<code>site</code>, <code>ai</code> o <code>upload</code>) y el mensaje de la vista previa lo dice, para que quien aprueba sepa qué está mandando.</p>
-
-  <h3>Criterios para la portada</h3>
-  <p>Es la foto más visible y va primero en la selección. El modelo prefiere, en este orden: alumnos en actividad real en la escuela, buena luz, sin texto ni logos encima, horizontal y con el centro de interés compatible con el recorte curvo. Si la mejor candidata del sitio no alcanza 1200 px, se genera con IA en lugar de estirarla. La foto actual de PROUD mide 549 × 350 px y se ve pixelada.</p>
-
-  <h3>Reglas de la imagen IA</h3>
-  <ul>
-    <li>Puede haber personas, pero nadie reconocible en primer plano: grupos, de espaldas, fuera de foco o a media distancia.</li>
-    <li>Sin texto, letreros ni logos generados.</li>
-    <li>Estilo fotográfico realista, sin forzar los colores de la escuela.</li>
-    <li>Normalmente se generan como máximo 3 (una por espacio). Tope duro de 6 por propuesta, contando las regeneraciones pedidas por el equipo. Al llegar al tope, Propel lo avisa y pide una foto subida.</li>
-  </ul>
-</section>
-
-<section id="s8">
-  <h2>8. Datos: Supabase compartido</h2>
-  <p>El plan gratuito ya no permite otro proyecto, así que Propel usa el proyecto de LandingPilot. Es una práctica común con apps pequeñas del mismo equipo, siempre que cada app tenga su propio espacio y nunca toque el de la otra.</p>
-
-  <h3>Reglas de convivencia</h3>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Tema</th><th>LandingPilot</th><th>Propel</th></tr></thead>
-      <tbody>
-        <tr><td>Tablas y enums</td><td>Schema <code>public</code></td><td>Schema <code>propel</code></td></tr>
-        <tr><td>Storage</td><td>Bucket <code>brand-assets</code></td><td>Bucket privado <code>propel-proposals</code></td></tr>
-        <tr><td>Migraciones</td><td><code>supabase db push</code>, como hoy</td><td>Script propio <code>npm run db:migrate</code>, con registro en <code>propel.schema_migrations</code>. Nunca <code>db push</code> ni <code>migration repair</code>.</td></tr>
-        <tr><td>Acceso anónimo</td><td>La anon key inserta leads desde las landings</td><td>Sin grants para <code>anon</code> ni <code>authenticated</code>. RLS activo sin políticas.</td></tr>
-        <tr><td>Cliente en código</td><td>Schema por default</td><td><code>createClient(url, key, { db: { schema: "propel" } })</code></td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Propel no lee ni referencia tablas de LandingPilot en V1. Si después se quiere cruzar "esta escuela tiene landing y propuesta", se hace con una vista.</p>
-
-  <div class="callout">
-    <span class="label">Por qué un script de migraciones propio</span>
-    <p>El CLI de Supabase lleva un solo historial de migraciones por proyecto. Un <code>db push</code> desde el repo de Propel vería las 11 migraciones de LandingPilot como faltantes y se negaría a seguir, y "arreglarlo" con <code>migration repair</code> desordena el historial de LandingPilot. El script de Propel solo toca el schema <code>propel</code> y lleva su propio registro.</p>
-  </div>
-
-  <div class="callout">
-    <span class="label">Riesgo aceptado</span>
-    <p>La <code>service_role</code> key vale para todo el proyecto, así que Propel técnicamente podría tocar datos de LandingPilot. Se acepta en V1 porque las dos apps son del mismo equipo y el aislamiento está en el código. Si se necesita más, se crea un rol de Postgres solo para Propel.</p>
-  </div>
-
-  <h3>Esquema</h3>
-  <pre>create schema propel;
-
-propel.proposals
-  id                uuid pk
-  school_name       text            -- "PROUD Academy"
-  school_possessive text            -- "PROUD Academy's"
-  school_short      text null
-  website_url       text
-  campus_mode       propel.campus_mode   -- single | network
-  proposal_date     date
-  template_version  text            -- hash de git de template/
-  status            propel.proposal_status
-  approved_version  int null        -- qué versión se entregó
-  ai_images_used    int default 0   -- para el tope de 6
-  requested_by      text            -- telegram user id
-  telegram_chat_id  text
-  error             text null
-  created_at, updated_at timestamptz
-
-propel.proposal_versions
-  id            uuid pk
-  proposal_id   uuid fk → proposals
-  version       int             -- 1, 2, 3...
-  pdf_path      text            -- propel-proposals/{proposal_id}/v{n}.pdf
-  size_bytes    int
-  created_at    timestamptz
-
-propel.proposal_photos
-  id            uuid pk
-  proposal_id   uuid fk → proposals
-  slot          text     -- cover | mission | testimonials
-  source        text     -- site | ai | upload
-  source_url    text     -- URL original, prompt de IA o file_id de Telegram
-  storage_path  text     -- versión recortada que usa el PDF
-  width, height int
-  selected      bool
-  created_at    timestamptz
-
-propel.proposal_events
-  id, proposal_id, type, payload jsonb, created_at
-
-propel.schema_migrations
-  version text pk, applied_at timestamptz</pre>
-
-  <h3>Límites del plan gratuito (compartidos entre las dos apps)</h3>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Límite</th><th>Plan</th></tr></thead>
-      <tbody>
-        <tr><td>Storage: 1 GB</td><td>PDFs de 3 a 5 MB con fotos comprimidas. Las versiones no aprobadas y sus fotos se borran a los 30 días; se conserva solo el PDF entregado.</td></tr>
-        <tr><td>Base de datos: 500 MB</td><td>Propel guarda muy pocos datos, no es un problema.</td></tr>
-        <tr><td>Pausa por inactividad</td><td>Con dos apps usando el proyecto es menos probable que pase.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section id="s9">
-  <h2>9. Tools, canales e integraciones</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Tool</th><th>Qué hace</th><th>Aprobación</th></tr></thead>
-      <tbody>
-        <tr><td><code>start_proposal</code></td><td>Crea el registro con nombre, variantes, URL, modo campus y fecha</td><td>No</td></tr>
-        <tr><td><code>harvest_site_photos</code></td><td>Barre el sitio y registra candidatas verificadas</td><td>No</td></tr>
-        <tr><td><code>rank_photos</code></td><td>Asigna la mejor candidata a cada espacio, con motivo</td><td>No</td></tr>
-        <tr><td><code>generate_ai_photo</code></td><td>Genera la imagen de un espacio y aplica el tope</td><td>No</td></tr>
-        <tr><td><code>set_slot_photo</code></td><td>Fija una foto en un espacio: otra del sitio, IA o una subida al chat</td><td>No</td></tr>
-        <tr><td><code>render_proposal</code></td><td>HTML → PDF, validación, sube la versión y manda la vista previa</td><td>No</td></tr>
-        <tr><td><code>deliver_proposal</code></td><td>Marca la versión como final, manda el PDF y el link firmado</td><td>Sí, botón de Telegram</td></tr>
-        <tr><td><code>list_proposals</code></td><td>Historial por escuela o fecha</td><td>No</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Skills: <code>photo-selection</code> (criterios por espacio, con la portada primero) y <code>school-name-variants</code> (posesivos, artículos y abreviaturas).</p>
-
-  <h3>Canales</h3>
-  <ul>
-    <li><strong>Telegram (V1).</strong> Chat privado. Lista de chats permitidos, fail-closed. Acepta fotos y PDFs subidos de hasta 10 MB. Archivo entregado: <code>Proposal - {School}.pdf</code>.</li>
-    <li><strong>Scale CRM (V2).</strong> Canal <code>POST /propel/task</code> con el mismo contrato de LandingPilot: <code>kind: "create"</code> con escuela, URL y modo campus, y <code>kind: "comment"</code> para pedir cambios desde la tarjeta. El estado vuelve a Scale por webhook. Se implementa coordinando con el repo <code>trusted-scale</code>.</li>
-  </ul>
-
-  <h3>Variables de entorno</h3>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Variable</th><th>Origen</th></tr></thead>
-      <tbody>
-        <tr><td><code>AI_GATEWAY_API_KEY</code> (o OIDC de Vercel)</td><td>Vercel, mismo team</td></tr>
-        <tr><td><code>FIRECRAWL_API_KEY</code></td><td>La misma de LandingPilot</td></tr>
-        <tr><td><code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Las mismas de LandingPilot</td></tr>
-        <tr><td><code>SUPABASE_DB_URL</code></td><td>Nueva, solo para <code>db:migrate</code></td></tr>
-        <tr><td><code>TELEGRAM_BOT_TOKEN</code>, <code>TELEGRAM_WEBHOOK_SECRET_TOKEN</code>, <code>TELEGRAM_ALLOWED_CHAT_IDS</code></td><td>Bot nuevo de BotFather</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section id="s10">
-  <h2>10. Criterios de aceptación y evals</h2>
-  <h3>Validación antes de mandar cualquier PDF</h3>
-  <ul>
-    <li>Exactamente 21 páginas tamaño carta.</li>
-    <li>El texto extraído no contiene <code>{{</code>, bloques de campus sin resolver ni "PROUD" (salvo que la escuela sea PROUD).</li>
-    <li>En modo <code>single</code>, no aparece "Network-wide".</li>
-    <li>El nombre aparece en todas las posiciones esperadas.</li>
-    <li>Las 3 fotos existen y cumplen la resolución mínima.</li>
-    <li>El archivo pesa menos de 8 MB, con meta de 3 a 5 MB.</li>
-  </ul>
-
-  <h3>Evals</h3>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Caso</th><th>Qué se espera</th></tr></thead>
-      <tbody>
-        <tr><td>Regenerar PROUD Academy (red) con sus fotos originales</td><td>Diferencia visual contra el PDF de Canva por debajo del umbral en cada página</td></tr>
-        <tr><td>Escuela con buen sitio y fotos grandes</td><td>3 fotos del sitio, ninguna IA. La portada es la mejor de las candidatas.</td></tr>
-        <tr><td>Sitio sin fotos útiles</td><td>3 imágenes IA, sin nadie reconocible en primer plano, y lo dice en la vista previa</td></tr>
-        <tr><td>Sitio caído o SPA vacía</td><td>Avisa y ofrece seguir con IA, sin inventar nada</td></tr>
-        <tr><td>Escuela de un solo campus</td><td>Sin "Network-wide" y con todas las frases en su versión de un campus</td></tr>
-        <tr><td>Nombre terminado en "s" (St. Mary's, Williams Academies)</td><td>Posesivo correcto</td></tr>
-        <tr><td>Nombre largo (más de 40 caracteres)</td><td>La portada no se desborda</td></tr>
-        <tr><td>"En la portada usa una del gym"</td><td>Solo cambia la portada y manda una versión nueva</td></tr>
-        <tr><td>Foto subida al chat con "va en la 2"</td><td>Se usa en el espacio de la página 2</td></tr>
-        <tr><td>Séptima imagen IA pedida</td><td>Se niega por el tope y pide una foto subida</td></tr>
-        <tr><td>Chat fuera de la lista</td><td>El bot no responde</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>Estos mismos casos se corren con cada modelo candidato del Gateway para elegir el default por calidad de selección de fotos y costo.</p>
-</section>
-
-<section id="s11">
-  <h2>11. Riesgos y mitigaciones</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Riesgo</th><th>Mitigación</th></tr></thead>
-      <tbody>
-        <tr><td>La reconstrucción en HTML no queda fiel a Canva</td><td>Comparación visual página por página como criterio de salida de la fase 0</td></tr>
-        <tr><td>Canva y el HTML se separan con el tiempo</td><td>Desde el lanzamiento, el HTML es la única versión maestra</td></tr>
-        <tr><td>Imágenes IA que parecen alumnos reales de la escuela</td><td>Nadie reconocible en primer plano. El origen se muestra en la vista previa.</td></tr>
-        <tr><td>Migraciones de Propel rompen el historial de LandingPilot</td><td>Script propio, solo sobre el schema <code>propel</code>, sin CLI de Supabase</td></tr>
-        <tr><td>La anon key de las landings expone datos de Propel</td><td>Sin grants para <code>anon</code>, RLS sin políticas, bucket privado</td></tr>
-        <tr><td>Se llena 1 GB de Storage compartido</td><td>PDFs comprimidos y limpieza de versiones no aprobadas a los 30 días</td></tr>
-        <tr><td>Chromium no cabe o tarda en la función</td><td>Prueba real en la fase 0. Alternativa: sandbox de eve.</td></tr>
-        <tr><td>Datos de contacto de clientes en los testimonios</td><td>Quedan como están, por decisión del equipo</td></tr>
-        <tr><td>Alguien fuera del equipo usa el bot</td><td>Lista de chats permitidos, fail-closed</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section id="s12">
-  <h2>12. Roadmap</h2>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Fase</th><th>Entregable</th><th>Criterio de salida</th></tr></thead>
-      <tbody>
-        <tr><td>0. Plantilla</td><td>21 páginas en HTML con assets, iconos Phosphor, variables y errores corregidos. Tabla de frases para un campus. Script local que genera el PDF. Prueba de Chromium en Vercel.</td><td>El equipo aprueba el PDF de PROUD regenerado, la tabla de iconos y la tabla de frases.</td></tr>
-        <tr><td>1. Agente en Telegram</td><td>Schema <code>propel</code> y bucket, tools, fotos, vista previa, cambios, entrega. Evals y elección de modelo.</td><td>5 propuestas reales aprobadas sin cambios manuales.</td></tr>
-        <tr><td>2. Afinado</td><td>Limpieza de Storage, métricas de tiempo y costo por propuesta, ajustes de selección de fotos.</td><td>9 de cada 10 propuestas aprobadas sin cambios durante 2 semanas.</td></tr>
-        <tr><td>3. Scale CRM</td><td>Canal <code>/propel/task</code> y webhook de estado, coordinado con <code>trusted-scale</code>.</td><td>Una propuesta pedida y aprobada desde una tarjeta de Scale.</td></tr>
-        <tr><td>4. Más plantillas</td><td>EnrollED y otras propuestas.</td><td>Por definir.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section id="s13">
-  <h2>13. Estructura del repo</h2>
-  <pre>propel-agent/                      (local: proposal-creator/)
-├── PRD.html
-├── brand/
-│   ├── trusted-logo-dark.png      ya existe
-│   └── trusted-logo-white.png     ya existe
-├── agent/
-│   ├── agent.ts
-│   ├── instructions.md
-│   ├── channels/
-│   │   ├── telegram.ts            ya existe
-│   │   └── scale.ts               fase 3
-│   ├── tools/
-│   │   ├── start_proposal.ts
-│   │   ├── harvest_site_photos.ts
-│   │   ├── rank_photos.ts
-│   │   ├── generate_ai_photo.ts
-│   │   ├── set_slot_photo.ts
-│   │   ├── render_proposal.ts
-│   │   ├── deliver_proposal.ts
-│   │   └── list_proposals.ts
-│   ├── skills/
-│   │   ├── photo-selection.md
-│   │   └── school-name-variants.md
-│   └── lib/
-│       ├── scrape.ts              copiado de LandingPilot
-│       ├── image-gen.ts           adaptado de LandingPilot
-│       ├── photos.ts              recorte y compresión
-│       ├── render.ts              HTML → PDF
-│       ├── validate.ts
-│       └── db.ts                  cliente con schema "propel"
-├── template/
-│   └── full-service/
-│       ├── index.html             21 páginas
-│       ├── styles.css
-│       ├── slots.json             espacios de foto: tamaño, orientación, mínimo
-│       └── assets/                extraídos del PDF de Canva
-├── db/
-│   └── migrations/                SQL solo del schema propel
-├── evals/
-│   └── fixtures/proud-academy/    PDF original y fotos para la comparación
-└── scripts/
-    ├── migrate.ts                 npm run db:migrate
-    ├── extract-canva-assets.py
-    └── render-local.ts</pre>
-</section>
-
-<section id="s14">
-  <h2>14. Pendientes</h2>
-  <ul>
-    <li><strong>Antes de la fase 1:</strong> agregar <code>propel</code> a los schemas expuestos del API de Supabase (Settings → API) y crear el bot de Telegram.</li>
-    <li><strong>En la fase 0:</strong> aprobar la tabla de frases para un campus, la de iconos Phosphor y el PDF de PROUD regenerado.</li>
-    <li><strong>En la fase 1:</strong> elegir el modelo default según los evals.</li>
-    <li><strong>En la fase 3:</strong> coordinar con <code>trusted-scale</code> el contrato del canal y del webhook.</li>
-  </ul>
-</section>
-
-<footer class="doc">
-  Propel · PRD · 28 de septiembre de 2026
-</footer>
-
+<section id="alcance"><h2><span class="n">04</span>Alcance</h2>
+<div class="grid">
+<div class="card"><h3>Dentro de V1</h3><ul>
+<li>Telegram, en chat privado</li>
+<li>Canal #propel en Scale CRM, con hilos</li>
+<li>Fotos desde el sitio de la escuela (Firecrawl)</li>
+<li>Imágenes con IA cuando el sitio no sirve, máximo 6</li>
+<li>PDF de la plantilla Full-Service, 19 páginas</li>
+<li>Aprobación humana antes de entregar</li>
+<li>Versiones: cada render guarda v1, v2, v3</li>
+<li>Link de descarga de 30 días</li>
+</ul></div>
+<div class="card"><h3>Fuera de V1</h3><ul>
+<li>Otras plantillas que no sean Full-Service</li>
+<li>Editar el texto de la propuesta</li>
+<li>Fotos de stock</li>
+<li>Una interfaz web propia: Scale la reemplaza</li>
+<li>Enviar la propuesta por correo a la escuela</li>
+</ul></div>
 </div>
+</section>
+<section id="flujo"><h2><span class="n">05</span>Flujo de una propuesta</h2>
+<p>Estos son los pasos, en orden. Los hace el agente solo, y la persona interviene para dar los datos iniciales, pedir cambios y aprobar.</p>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 1105" style="min-width:700px" role="img" aria-label="Diagrama 2. Los pasos de una propuesta. Cada recuadro de tipo Tool es una función del agente (sección 11).">
+<defs><marker id="arr-flow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 300.0 129.0 L 300.0 165.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 300.0 276.0 L 300.0 312.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 300.0 402.0 L 300.0 413.0 Q 300.0 420.0 293.0 420.0 L 157.0 420.0 Q 150.0 420.0 150.0 427.0 L 150.0 438.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 300.0 402.0 L 300.0 413.0 Q 300.0 420.0 307.0 420.0 L 443.0 420.0 Q 450.0 420.0 450.0 427.0 L 450.0 438.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 150.0 549.0 L 150.0 560.0 Q 150.0 567.0 157.0 567.0 L 293.0 567.0 Q 300.0 567.0 300.0 574.0 L 300.0 585.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 450.0 549.0 L 450.0 560.0 Q 450.0 567.0 443.0 567.0 L 307.0 567.0 Q 300.0 567.0 300.0 574.0 L 300.0 585.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 300.0 696.0 L 300.0 732.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 450.0 780.5 L 484.5 780.5 Q 490.0 780.5 490.0 786.0 L 490.0 786.0 Q 490.0 791.5 495.5 791.5 L 530.0 791.5" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 650.0 732.0 L 650.0 659.5 Q 650.0 652.5 643.0 652.5 L 450.0 652.5" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 300.0 805.0 L 300.0 863.0" class="edge" marker-end="url(#arr-flow)"/>
+<path d="M 300.0 974.0 L 300.0 1010.0" class="edge" marker-end="url(#arr-flow)"/>
+<g class="node ">
+<text class="kind" x="150.0" y="33.0">TOOL</text>
+<rect class="box" x="150.0" y="42.0" width="300" height="87.0" rx="3"/>
+<text class="title" x="164.0" y="66.0">start_proposal</text>
+<text class="cap" x="164.0" y="82.0">Crea el registro: nombre, posesivo, sitio y</text>
+<text class="cap" x="164.0" y="98.0">campus o red.</text>
+</g>
+<g class="node ">
+<text class="kind" x="150.0" y="180.0">TOOL</text>
+<rect class="box" x="150.0" y="189.0" width="300" height="87.0" rx="3"/>
+<text class="title" x="164.0" y="213.0">harvest_site_photos</text>
+<text class="cap" x="164.0" y="229.0">Firecrawl lee la home y /about y devuelve</text>
+<text class="cap" x="164.0" y="245.0">las fotos de 600 px o más.</text>
+</g>
+<g class="node ">
+<text class="kind" x="150.0" y="327.0">DECISIÓN</text>
+<rect class="box" x="150.0" y="336.0" width="300" height="66.0" rx="3"/>
+<text class="title" x="164.0" y="360.0">¿El sitio tiene foto útil para cada</text>
+<text class="title" x="164.0" y="377.0">espacio?</text>
+</g>
+<g class="node ">
+<text class="kind" x="25.0" y="453.0">TOOL</text>
+<rect class="box" x="25.0" y="462.0" width="250" height="87.0" rx="3"/>
+<text class="title" x="39.0" y="486.0">set_slot_photo</text>
+<text class="cap" x="39.0" y="502.0">Guarda la foto del sitio en el</text>
+<text class="cap" x="39.0" y="518.0">espacio.</text>
+</g>
+<g class="node ">
+<text class="kind" x="325.0" y="453.0">TOOL</text>
+<rect class="box" x="325.0" y="462.0" width="250" height="87.0" rx="3"/>
+<text class="title" x="339.0" y="486.0">generate_ai_photo</text>
+<text class="cap" x="339.0" y="502.0">Imagen con gpt-image-2. Máximo 6 por</text>
+<text class="cap" x="339.0" y="518.0">propuesta.</text>
+</g>
+<g class="node ">
+<text class="kind" x="150.0" y="600.0">TOOL</text>
+<rect class="box" x="150.0" y="609.0" width="300" height="87.0" rx="3"/>
+<text class="title" x="164.0" y="633.0">render_proposal</text>
+<text class="cap" x="164.0" y="649.0">Arma el PDF, lo guarda como versión nueva y</text>
+<text class="cap" x="164.0" y="665.0">el canal lo manda al chat.</text>
+</g>
+<g class="node ">
+<text class="kind" x="150.0" y="747.0">DECISIÓN</text>
+<rect class="box" x="150.0" y="756.0" width="300" height="49.0" rx="3"/>
+<text class="title" x="164.0" y="780.0">¿Piden cambios?</text>
+</g>
+<g class="node human">
+<text class="kind" x="530.0" y="747.0">PERSONA</text>
+<rect class="box" x="530.0" y="756.0" width="240" height="71.0" rx="3"/>
+<text class="title" x="544.0" y="780.0">Pide el cambio</text>
+<text class="cap" x="544.0" y="796.0">Por ejemplo: otra foto de portada.</text>
+</g>
+<g class="node inv">
+<text class="kind" x="150.0" y="878.0">APROBACIÓN</text>
+<rect class="box" x="150.0" y="887.0" width="300" height="87.0" rx="3"/>
+<text class="title" x="164.0" y="911.0">deliver_proposal</text>
+<text class="cap" x="164.0" y="927.0">eve pausa hasta que alguien responda</text>
+<text class="cap" x="164.0" y="943.0">approve.</text>
+</g>
+<g class="node ">
+<text class="kind" x="150.0" y="1025.0">SALIDA</text>
+<rect class="box" x="150.0" y="1034.0" width="300" height="49.0" rx="3"/>
+<text class="title" x="164.0" y="1058.0">PDF final y link de 30 días</text>
+</g>
+<text class="elabel" x="225.0" y="424.0" text-anchor="middle">sí</text>
+<text class="elabel" x="375.0" y="424.0" text-anchor="middle">no</text>
+<text class="elabel" x="490.0" y="790.0" text-anchor="middle">sí</text>
+<text class="elabel" x="550.0" y="656.5" text-anchor="middle">nueva versión</text>
+<text class="elabel" x="300.0" y="838.0" text-anchor="middle">no</text>
+</svg></div>
+<figcaption>Diagrama 2. Los pasos de una propuesta. Cada recuadro de tipo Tool es una función del agente (sección 11).</figcaption></figure>
+<ol>
+<li><strong>Datos.</strong> Si falta el sitio, o no queda claro si es un campus o una red, el agente lo pregunta antes de crear nada.</li>
+<li><strong>Fotos.</strong> Primero el sitio de la escuela. La IA solo entra si el sitio no tiene nada útil (sección 6).</li>
+<li><strong>Render.</strong> Se genera una versión nueva en cada llamada. Nunca se sobrescribe la anterior.</li>
+<li><strong>Cambios.</strong> Si piden otra foto, se corrige solo ese espacio y se vuelve a renderizar.</li>
+<li><strong>Entrega.</strong> Solo con aprobación humana (sección 7).</li>
+</ol>
+</section>
+<section id="fotos"><h2><span class="n">06</span>Fotos</h2>
+<p>Cada propuesta tiene tres espacios de foto. Todo lo demás (logos, capturas de producto, fotos de TrustED) viene fijo con la plantilla.</p>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 608" style="min-width:700px" role="img" aria-label="Diagrama 3. Cómo se decide la foto de cada espacio (portada, misión y Centralized Enrollment).">
+<defs><marker id="arr-photos" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 400.0 129.0 L 400.0 165.0" class="edge" marker-end="url(#arr-photos)"/>
+<path d="M 400.0 276.0 L 400.0 287.0 Q 400.0 294.0 393.0 294.0 L 177.0 294.0 Q 170.0 294.0 170.0 301.0 L 170.0 312.0" class="edge" marker-end="url(#arr-photos)"/>
+<path d="M 400.0 276.0 L 400.0 287.0 Q 400.0 294.0 407.0 294.0 L 593.0 294.0 Q 600.0 294.0 600.0 301.0 L 600.0 312.0" class="edge" marker-end="url(#arr-photos)"/>
+<path d="M 600.0 402.0 L 600.0 431.5 Q 600.0 438.5 593.0 438.5 L 477.0 438.5 Q 470.0 438.5 470.0 445.5 L 470.0 475.0" class="edge" marker-end="url(#arr-photos)"/>
+<path d="M 600.0 402.0 L 600.0 431.5 Q 600.0 438.5 607.0 438.5 L 698.0 438.5 Q 705.0 438.5 705.0 445.5 L 705.0 475.0" class="edge" marker-end="url(#arr-photos)"/>
+<g class="node ">
+<text class="kind" x="230.0" y="33.0">ENTRADA</text>
+<rect class="box" x="230.0" y="42.0" width="340" height="87.0" rx="3"/>
+<text class="title" x="244.0" y="66.0">Candidatas del sitio</text>
+<text class="cap" x="244.0" y="82.0">harvest_site_photos las ordena de mayor a menor</text>
+<text class="cap" x="244.0" y="98.0">resolución.</text>
+</g>
+<g class="node ">
+<text class="kind" x="210.0" y="180.0">DECISIÓN</text>
+<rect class="box" x="210.0" y="189.0" width="380" height="87.0" rx="3"/>
+<text class="title" x="224.0" y="213.0">¿Alguna cumple el mínimo del espacio?</text>
+<text class="cap" x="224.0" y="229.0">Portada: 1200 px de lado largo. Misión y Centralized: 800</text>
+<text class="cap" x="224.0" y="245.0">px.</text>
+</g>
+<g class="node ">
+<text class="kind" x="35.0" y="327.0">TOOL</text>
+<rect class="box" x="35.0" y="336.0" width="270" height="103.0" rx="3"/>
+<text class="title" x="49.0" y="360.0">set_slot_photo</text>
+<text class="cap" x="49.0" y="376.0">Usa la foto del sitio. Para la portada</text>
+<text class="cap" x="49.0" y="392.0">se prefiere alumnos en actividad real,</text>
+<text class="cap" x="49.0" y="408.0">horizontal y sin texto encima.</text>
+</g>
+<g class="node ">
+<text class="kind" x="465.0" y="327.0">DECISIÓN</text>
+<rect class="box" x="465.0" y="336.0" width="270" height="66.0" rx="3"/>
+<text class="title" x="479.0" y="360.0">¿Ya van 6 imágenes con IA en esta</text>
+<text class="title" x="479.0" y="377.0">propuesta?</text>
+</g>
+<g class="node ">
+<text class="kind" x="345.0" y="490.0">TOOL</text>
+<rect class="box" x="345.0" y="499.0" width="250" height="87.0" rx="3"/>
+<text class="title" x="359.0" y="523.0">generate_ai_photo</text>
+<text class="cap" x="359.0" y="539.0">Foto realista, sin nadie reconocible</text>
+<text class="cap" x="359.0" y="555.0">en primer plano, sin texto ni logos.</text>
+</g>
+<g class="node human">
+<text class="kind" x="620.0" y="490.0">PERSONA</text>
+<rect class="box" x="620.0" y="499.0" width="170" height="87.0" rx="3"/>
+<text class="title" x="634.0" y="523.0">Foto del equipo</text>
+<text class="cap" x="634.0" y="539.0">Se pide y se usa con</text>
+<text class="cap" x="634.0" y="555.0">set_slot_photo.</text>
+</g>
+<text class="elabel" x="285.0" y="298.0" text-anchor="middle">sí</text>
+<text class="elabel" x="500.0" y="298.0" text-anchor="middle">no</text>
+<text class="elabel" x="535.0" y="442.5" text-anchor="middle">no</text>
+<text class="elabel" x="652.5" y="442.5" text-anchor="middle">sí</text>
+</svg></div>
+<figcaption>Diagrama 3. Cómo se decide la foto de cada espacio (portada, misión y Centralized Enrollment).</figcaption></figure>
+<div class="table-wrap"><table>
+<thead><tr><th>Espacio</th><th>Página</th><th>Mínimo</th><th>Criterio</th></tr></thead>
+<tbody>
+<tr><td><code>cover</code></td><td>1</td><td>1200 px de lado largo</td><td>Es la foto más visible del documento. Alumnos en actividad real, buena luz, horizontal, sin texto ni logos encima. Si ninguna llega al mínimo se genera con IA, porque una foto chica estirada se ve peor que una generada.</td></tr>
+<tr><td><code>mission</code></td><td>2</td><td>800 px</td><td>Alumnos con docentes, si el sitio lo tiene (suele estar en /about).</td></tr>
+<tr><td><code>centralized</code></td><td>4</td><td>800 px</td><td>Cualquier foto de la comunidad escolar.</td></tr>
+</tbody></table></div>
+<h3>Reglas de las imágenes con IA</h3>
+<ul>
+<li>Pueden aparecer personas, pero nadie reconocible en primer plano: grupos, de espaldas, fuera de foco o a media distancia.</li>
+<li>Sin texto, letreros ni logos.</li>
+<li>Máximo 6 generaciones por propuesta, contando las regeneraciones. Al llegar al tope, la tool devuelve un error a propósito y el agente pide una foto al equipo.</li>
+<li>No se usan fotos de stock. Una foto de stock con menores presentada como alumnos de la escuela es un riesgo que no se corre.</li>
+</ul>
+<p>El filtro de la tool de búsqueda es de 600 px. Los mínimos de 1200 y 800 los aplica el agente siguiendo la skill <code>photo-selection</code>.</p>
+</section>
+<section id="aprobacion"><h2><span class="n">07</span>Aprobación y entrega</h2>
+<p>La entrega pasa por una aprobación de eve (<code>approval: always()</code> en <code>deliver_proposal</code>). Mientras no se responda <code>approve</code>, la tool no corre y la propuesta no se marca como entregada.</p>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 1072" style="min-width:700px" role="img" aria-label="Diagrama 4. Qué pasa cuando alguien escribe "aprobado".">
+<defs><marker id="arr-approval" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 400.0 113.0 L 400.0 149.0" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 400.0 260.0 L 400.0 296.0" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 400.0 369.0 L 400.0 380.0 Q 400.0 387.0 393.0 387.0 L 177.0 387.0 Q 170.0 387.0 170.0 394.0 L 170.0 405.0" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 400.0 369.0 L 400.0 380.0 Q 400.0 387.0 407.0 387.0 L 593.0 387.0 Q 600.0 387.0 600.0 394.0 L 600.0 405.0" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 600.0 516.0 L 600.0 552.0" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 600.0 663.0 L 600.0 699.0" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 170.0 516.0 L 170.0 860.5 Q 170.0 867.5 177.0 867.5 L 235.0 867.5" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 600.0 772.0 L 600.0 860.5 Q 600.0 867.5 593.0 867.5 L 565.0 867.5" class="edge" marker-end="url(#arr-approval)"/>
+<path d="M 400.0 903.0 L 400.0 939.0" class="edge" marker-end="url(#arr-approval)"/>
+<g class="node human">
+<text class="kind" x="235.0" y="33.0">PERSONA</text>
+<rect class="box" x="235.0" y="42.0" width="330" height="71.0" rx="3"/>
+<text class="title" x="249.0" y="66.0">Escribe "aprobado"</text>
+<text class="cap" x="249.0" y="82.0">O approve, aprobada, aprobar.</text>
+</g>
+<g class="node ">
+<text class="kind" x="235.0" y="164.0">CANAL</text>
+<rect class="box" x="235.0" y="173.0" width="330" height="87.0" rx="3"/>
+<text class="title" x="249.0" y="197.0">Traduce a approve</text>
+<text class="cap" x="249.0" y="213.0">eve solo reconoce la palabra exacta approve. En</text>
+<text class="cap" x="249.0" y="229.0">español no la reconocería.</text>
+</g>
+<g class="node ">
+<text class="kind" x="235.0" y="311.0">DECISIÓN</text>
+<rect class="box" x="235.0" y="320.0" width="330" height="49.0" rx="3"/>
+<text class="title" x="249.0" y="344.0">¿Hay una aprobación pendiente?</text>
+</g>
+<g class="node ">
+<text class="kind" x="45.0" y="420.0">ESTADO</text>
+<rect class="box" x="45.0" y="429.0" width="250" height="87.0" rx="3"/>
+<text class="title" x="59.0" y="453.0">Se resuelve</text>
+<text class="cap" x="59.0" y="469.0">La tool corre y la propuesta pasa a</text>
+<text class="cap" x="59.0" y="485.0">delivered.</text>
+</g>
+<g class="node ">
+<text class="kind" x="465.0" y="420.0">AGENTE</text>
+<rect class="box" x="465.0" y="429.0" width="270" height="87.0" rx="3"/>
+<text class="title" x="479.0" y="453.0">El modelo llama a deliver_proposal</text>
+<text class="cap" x="479.0" y="469.0">Lo hace en ese mismo turno, sin pedir</text>
+<text class="cap" x="479.0" y="485.0">otra confirmación en texto.</text>
+</g>
+<g class="node inv">
+<text class="kind" x="465.0" y="567.0">APROBACIÓN</text>
+<rect class="box" x="465.0" y="576.0" width="270" height="87.0" rx="3"/>
+<text class="title" x="479.0" y="600.0">eve pausa y pide approve</text>
+<text class="cap" x="479.0" y="616.0">El canal ya mandó el PDF para que se</text>
+<text class="cap" x="479.0" y="632.0">vea qué se aprueba.</text>
+</g>
+<g class="node human">
+<text class="kind" x="465.0" y="714.0">PERSONA</text>
+<rect class="box" x="465.0" y="723.0" width="270" height="49.0" rx="3"/>
+<text class="title" x="479.0" y="747.0">Responde approve</text>
+</g>
+<g class="node ">
+<text class="kind" x="235.0" y="823.0">TOOL</text>
+<rect class="box" x="235.0" y="832.0" width="330" height="71.0" rx="3"/>
+<text class="title" x="249.0" y="856.0">deliver_proposal</text>
+<text class="cap" x="249.0" y="872.0">Guarda status delivered y approved_version.</text>
+</g>
+<g class="node ">
+<text class="kind" x="210.0" y="954.0">SALIDA</text>
+<rect class="box" x="210.0" y="963.0" width="380" height="87.0" rx="3"/>
+<text class="title" x="224.0" y="987.0">El canal manda el PDF final y el link</text>
+<text class="cap" x="224.0" y="1003.0">Archivo Proposal - Escuela.pdf y un mensaje con el link</text>
+<text class="cap" x="224.0" y="1019.0">de 30 días.</text>
+</g>
+<text class="elabel" x="285.0" y="391.0" text-anchor="middle">sí</text>
+<text class="elabel" x="500.0" y="391.0" text-anchor="middle">no</text>
+</svg></div>
+<figcaption>Diagrama 4. Qué pasa cuando alguien escribe "aprobado".</figcaption></figure>
+<div class="callout"><span class="label">Decisión</span><p>Se mantiene la aprobación de eve aunque cueste dos mensajes ("aprobado" y luego approve). Nadie entrega por error. Si el equipo prefiere uno solo, hay que quitar la aprobación para el canal de Scale, y eso se decide aparte.</p></div>
+<h3>El modelo no maneja links</h3>
+<p>En la primera prueba de Scale el link de descarga salió roto. La causa: <code>render_proposal</code> devolvía la URL firmada al modelo y el modelo la reescribía en su mensaje cambiando un carácter. La solución fue que las tools devuelvan solo la ruta (<code>storagePath</code>) y que cada canal firme el link y suba el archivo.</p>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 413" style="min-width:700px" role="img" aria-label="Diagrama 5. Por qué el canal manda el PDF y el modelo no toca los links.">
+<defs><marker id="arr-url" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 200.0 113.0 L 200.0 149.0" class="edge" marker-end="url(#arr-url)"/>
+<path d="M 200.0 260.0 L 200.0 296.0" class="edge" marker-end="url(#arr-url)"/>
+<path d="M 600.0 113.0 L 600.0 149.0" class="edge" marker-end="url(#arr-url)"/>
+<path d="M 600.0 244.0 L 600.0 296.0" class="edge" marker-end="url(#arr-url)"/>
+<g class="node ">
+<text class="kind" x="40.0" y="33.0">ANTES</text>
+<rect class="box" x="40.0" y="42.0" width="320" height="71.0" rx="3"/>
+<text class="title" x="54.0" y="66.0">render_proposal devuelve una URL firmada</text>
+<text class="cap" x="54.0" y="82.0">Es un token de unos 450 caracteres.</text>
+</g>
+<g class="node ">
+<text class="kind" x="40.0" y="164.0">AGENTE</text>
+<rect class="box" x="40.0" y="173.0" width="320" height="87.0" rx="3"/>
+<text class="title" x="54.0" y="197.0">El modelo la copia en su mensaje</text>
+<text class="cap" x="54.0" y="213.0">Un modelo de lenguaje reescribe, no copia byte</text>
+<text class="cap" x="54.0" y="229.0">a byte.</text>
+</g>
+<g class="node dashed">
+<text class="kind" x="40.0" y="311.0">ERROR</text>
+<rect class="box" x="40.0" y="320.0" width="320" height="71.0" rx="3"/>
+<text class="title" x="54.0" y="344.0">El link llega con un carácter cambiado</text>
+<text class="cap" x="54.0" y="360.0">Supabase responde Invalid Compact JWS.</text>
+</g>
+<g class="node ">
+<text class="kind" x="440.0" y="33.0">AHORA</text>
+<rect class="box" x="440.0" y="42.0" width="320" height="71.0" rx="3"/>
+<text class="title" x="454.0" y="66.0">render_proposal devuelve storagePath</text>
+<text class="cap" x="454.0" y="82.0">Solo la ruta del archivo en Storage.</text>
+</g>
+<g class="node ">
+<text class="kind" x="440.0" y="164.0">CANAL</text>
+<rect class="box" x="440.0" y="173.0" width="320" height="71.0" rx="3"/>
+<text class="title" x="454.0" y="197.0">El canal firma y descarga el PDF</text>
+<text class="cap" x="454.0" y="213.0">Lo hace el código, no el modelo.</text>
+</g>
+<g class="node ">
+<text class="kind" x="440.0" y="311.0">SALIDA</text>
+<rect class="box" x="440.0" y="320.0" width="320" height="71.0" rx="3"/>
+<text class="title" x="454.0" y="344.0">El PDF llega como archivo con su nombre</text>
+<text class="cap" x="454.0" y="360.0">Proposal - Escuela.pdf, no v1.pdf.</text>
+</g>
+</svg></div>
+<figcaption>Diagrama 5. Por qué el canal manda el PDF y el modelo no toca los links.</figcaption></figure>
+</section>
+<section id="arquitectura"><h2><span class="n">08</span>Arquitectura</h2>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 445" style="min-width:700px" role="img" aria-label="Diagrama 6. Piezas del sistema y quién habla con quién.">
+<defs><marker id="arr-arch" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 200.0 129.0 L 200.0 140.0 Q 200.0 147.0 207.0 147.0 L 393.0 147.0 Q 400.0 147.0 400.0 154.0 L 400.0 165.0" class="edge" marker-end="url(#arr-arch)"/>
+<path d="M 600.0 129.0 L 600.0 140.0 Q 600.0 147.0 593.0 147.0 L 407.0 147.0 Q 400.0 147.0 400.0 154.0 L 400.0 165.0" class="edge" marker-end="url(#arr-arch)"/>
+<path d="M 400.0 276.0 L 400.0 287.0 Q 400.0 294.0 393.0 294.0 L 112.0 294.0 Q 105.0 294.0 105.0 301.0 L 105.0 312.0" class="edge" marker-end="url(#arr-arch)"/>
+<path d="M 400.0 276.0 L 400.0 287.0 Q 400.0 294.0 393.0 294.0 L 312.0 294.0 Q 305.0 294.0 305.0 301.0 L 305.0 312.0" class="edge" marker-end="url(#arr-arch)"/>
+<path d="M 400.0 276.0 L 400.0 287.0 Q 400.0 294.0 407.0 294.0 L 498.0 294.0 Q 505.0 294.0 505.0 301.0 L 505.0 312.0" class="edge" marker-end="url(#arr-arch)"/>
+<path d="M 400.0 276.0 L 400.0 287.0 Q 400.0 294.0 407.0 294.0 L 698.0 294.0 Q 705.0 294.0 705.0 301.0 L 705.0 312.0" class="edge" marker-end="url(#arr-arch)"/>
+<g class="node ">
+<text class="kind" x="50.0" y="33.0">CANAL</text>
+<rect class="box" x="50.0" y="42.0" width="300" height="87.0" rx="3"/>
+<text class="title" x="64.0" y="66.0">Telegram</text>
+<text class="cap" x="64.0" y="82.0">Chat privado con @trustedpropel_bot. Solo</text>
+<text class="cap" x="64.0" y="98.0">chats permitidos.</text>
+</g>
+<g class="node ">
+<text class="kind" x="450.0" y="33.0">CANAL</text>
+<rect class="box" x="450.0" y="42.0" width="300" height="87.0" rx="3"/>
+<text class="title" x="464.0" y="66.0">Scale CRM, canal #propel</text>
+<text class="cap" x="464.0" y="82.0">Hilos. Entra por propel-dispatch y vuelve</text>
+<text class="cap" x="464.0" y="98.0">por propel-webhook.</text>
+</g>
+<g class="node ">
+<text class="kind" x="160.0" y="180.0">AGENTE</text>
+<rect class="box" x="160.0" y="189.0" width="480" height="87.0" rx="3"/>
+<text class="title" x="174.0" y="213.0">Propel, un agente eve en Vercel</text>
+<text class="cap" x="174.0" y="229.0">Dos canales, 7 tools, 2 skills e instrucciones. Proyecto propel-agent, URL</text>
+<text class="cap" x="174.0" y="245.0">propel-agent.vercel.app.</text>
+</g>
+<g class="node ">
+<text class="kind" x="10.0" y="327.0">SERVICIO</text>
+<rect class="box" x="10.0" y="336.0" width="190" height="87.0" rx="3"/>
+<text class="title" x="24.0" y="360.0">Firecrawl</text>
+<text class="cap" x="24.0" y="376.0">Lee el sitio de la</text>
+<text class="cap" x="24.0" y="392.0">escuela.</text>
+</g>
+<g class="node ">
+<text class="kind" x="210.0" y="327.0">SERVICIO</text>
+<rect class="box" x="210.0" y="336.0" width="190" height="87.0" rx="3"/>
+<text class="title" x="224.0" y="360.0">AI Gateway</text>
+<text class="cap" x="224.0" y="376.0">Modelo del agente e</text>
+<text class="cap" x="224.0" y="392.0">imágenes con gpt-image-2.</text>
+</g>
+<g class="node ">
+<text class="kind" x="410.0" y="327.0">SERVICIO</text>
+<rect class="box" x="410.0" y="336.0" width="190" height="87.0" rx="3"/>
+<text class="title" x="424.0" y="360.0">Supabase</text>
+<text class="cap" x="424.0" y="376.0">Base de datos (schema</text>
+<text class="cap" x="424.0" y="392.0">propel) y Storage.</text>
+</g>
+<g class="node ">
+<text class="kind" x="610.0" y="327.0">LIBRERÍA</text>
+<rect class="box" x="610.0" y="336.0" width="190" height="87.0" rx="3"/>
+<text class="title" x="624.0" y="360.0">react-pdf</text>
+<text class="cap" x="624.0" y="376.0">Corre dentro de</text>
+<text class="cap" x="624.0" y="392.0">render_proposal.</text>
+</g>
+<text class="elabel" x="300.0" y="151.0" text-anchor="middle">mensajes y PDFs</text>
+<text class="elabel" x="500.0" y="151.0" text-anchor="middle">mensajes y PDFs</text>
+</svg></div>
+<figcaption>Diagrama 6. Piezas del sistema y quién habla con quién.</figcaption></figure>
+<div class="table-wrap"><table>
+<thead><tr><th>Pieza</th><th>Para qué</th><th>Configuración</th></tr></thead>
+<tbody>
+<tr><td>Vercel</td><td>Corre el agente. Proyecto <code>propel-agent</code>, equipo <code>mora-os</code>.</td><td>Variables de entorno del proyecto</td></tr>
+<tr><td>AI Gateway</td><td>Modelo del agente (<code>openai/gpt-5.6-terra</code>) e imágenes (<code>openai/gpt-image-2</code>).</td><td><code>AI_GATEWAY_API_KEY</code></td></tr>
+<tr><td>Firecrawl</td><td>Lee la home y /about del sitio y devuelve las URLs de imágenes.</td><td><code>FIRECRAWL_API_KEY</code></td></tr>
+<tr><td>Supabase</td><td>Base de datos (schema <code>propel</code>) y Storage (bucket privado <code>propel-proposals</code>).</td><td><code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code></td></tr>
+<tr><td>react-pdf</td><td>Genera el PDF en memoria dentro de la función. No hay navegador.</td><td>Sin servicio externo</td></tr>
+</tbody></table></div>
+<div class="callout"><span class="label">Supabase compartido</span><p>El plan gratis no permite otro proyecto, así que Propel usa el de LandingPilot, aislado en su propio schema. La sección 14 explica cómo se protege.</p></div>
+</section>
+<section id="pdf"><h2><span class="n">09</span>Cómo se genera el PDF</h2>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 800" style="min-width:700px" role="img" aria-label="Diagrama 7. Lo que hace render_proposal por dentro.">
+<defs><marker id="arr-render" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 400.0 113.0 L 400.0 149.0" class="edge" marker-end="url(#arr-render)"/>
+<path d="M 400.0 260.0 L 400.0 296.0" class="edge" marker-end="url(#arr-render)"/>
+<path d="M 400.0 391.0 L 400.0 427.0" class="edge" marker-end="url(#arr-render)"/>
+<path d="M 400.0 500.0 L 400.0 511.0 Q 400.0 518.0 393.0 518.0 L 177.0 518.0 Q 170.0 518.0 170.0 525.0 L 170.0 536.0" class="edge" marker-end="url(#arr-render)"/>
+<path d="M 400.0 500.0 L 400.0 511.0 Q 400.0 518.0 407.0 518.0 L 593.0 518.0 Q 600.0 518.0 600.0 525.0 L 600.0 536.0" class="edge" marker-end="url(#arr-render)"/>
+<path d="M 600.0 647.0 L 600.0 683.0" class="edge" marker-end="url(#arr-render)"/>
+<g class="node ">
+<text class="kind" x="190.0" y="33.0">PASO 1</text>
+<rect class="box" x="190.0" y="42.0" width="420" height="71.0" rx="3"/>
+<text class="title" x="204.0" y="66.0">Lee la propuesta y baja las 3 fotos</text>
+<text class="cap" x="204.0" y="82.0">Las fotos elegidas se descargan de Storage.</text>
+</g>
+<g class="node ">
+<text class="kind" x="190.0" y="164.0">PASO 2</text>
+<rect class="box" x="190.0" y="173.0" width="420" height="87.0" rx="3"/>
+<text class="title" x="204.0" y="197.0">ensureAssets</text>
+<text class="cap" x="204.0" y="213.0">Si faltan fuentes, logos o capturas en /tmp, las baja de Storage</text>
+<text class="cap" x="204.0" y="229.0">(carpeta _assets).</text>
+</g>
+<g class="node ">
+<text class="kind" x="190.0" y="311.0">PASO 3</text>
+<rect class="box" x="190.0" y="320.0" width="420" height="71.0" rx="3"/>
+<text class="title" x="204.0" y="344.0">registerFonts y renderToBuffer</text>
+<text class="cap" x="204.0" y="360.0">react-pdf arma las 19 páginas en memoria.</text>
+</g>
+<g class="node ">
+<text class="kind" x="190.0" y="442.0">DECISIÓN</text>
+<rect class="box" x="190.0" y="451.0" width="420" height="49.0" rx="3"/>
+<text class="title" x="204.0" y="475.0">¿El PDF pesa más de 8 MB?</text>
+</g>
+<g class="node dashed">
+<text class="kind" x="45.0" y="551.0">ESTADO</text>
+<rect class="box" x="45.0" y="560.0" width="250" height="87.0" rx="3"/>
+<text class="title" x="59.0" y="584.0">failed</text>
+<text class="cap" x="59.0" y="600.0">Se guarda el error y se avisa en el</text>
+<text class="cap" x="59.0" y="616.0">chat.</text>
+</g>
+<g class="node ">
+<text class="kind" x="455.0" y="551.0">TOOL</text>
+<rect class="box" x="455.0" y="560.0" width="290" height="87.0" rx="3"/>
+<text class="title" x="469.0" y="584.0">Sube {id}/v{n}.pdf</text>
+<text class="cap" x="469.0" y="600.0">Registra la versión y deja la propuesta en</text>
+<text class="cap" x="469.0" y="616.0">awaiting_approval.</text>
+</g>
+<g class="node ">
+<text class="kind" x="455.0" y="698.0">SALIDA</text>
+<rect class="box" x="455.0" y="707.0" width="290" height="71.0" rx="3"/>
+<text class="title" x="469.0" y="731.0">Devuelve storagePath</text>
+<text class="cap" x="469.0" y="747.0">El canal manda el archivo al chat.</text>
+</g>
+<text class="elabel" x="285.0" y="522.0" text-anchor="middle">sí</text>
+<text class="elabel" x="500.0" y="522.0" text-anchor="middle">no</text>
+</svg></div>
+<figcaption>Diagrama 7. Lo que hace render_proposal por dentro.</figcaption></figure>
+<h3>Las 19 páginas</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Páginas</th><th>Contenido</th><th>Qué cambia</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Portada</td><td>Nombre, fecha, foto, "Network-wide"</td></tr>
+<tr><td>2</td><td>Misión</td><td>Nombre, foto</td></tr>
+<tr><td>3</td><td>Partner</td><td>Nombre, " across all campuses"</td></tr>
+<tr><td>4</td><td>Centralized Enrollment</td><td>Nombre, foto</td></tr>
+<tr><td>5</td><td>Precios</td><td>Nada</td></tr>
+<tr><td>6 a 11</td><td>Los seis pilares: Lead Generation, Robust CRM, Parent Outreach, Data Dashboards, Full Marketing Design, CMO Strategy</td><td>Nombre en dashboards, marketing y CMO</td></tr>
+<tr><td>12</td><td>Comparación de costos</td><td>Nada</td></tr>
+<tr><td>13</td><td>Testimonios</td><td>Nada</td></tr>
+<tr><td>14</td><td>Portada del acuerdo</td><td>Nada</td></tr>
+<tr><td>15 a 19</td><td>Acuerdo (texto legal que fluye en varias páginas)</td><td>Nombre y posesivo</td></tr>
+</tbody></table></div>
+<h3>Reglas de diseño</h3>
+<ul>
+<li>Tamaño carta, 612 x 792 pt.</li>
+<li>Tipografía: Manrope en títulos e Inter en cuerpo. Los títulos llevan letter-spacing de -1.</li>
+<li>Iconos Phosphor. Sobre fondo claro, peso <code>fill</code>.</li>
+<li>El duotono solo va en la foto de portada.</li>
+<li>Las imágenes de Lead Generation y CMO Strategy usan <code>objectFit: "contain"</code> y fondo blanco: no se recortan.</li>
+</ul>
+<h3>Assets fijos</h3>
+<p>Fuentes, logos y capturas viven en Storage, carpeta <code>_assets/</code>. En Vercel el bundle no incluye archivos que se referencian por ruta, así que se descargan a <code>/tmp</code> la primera vez que una instancia los necesita. Si agregas un asset a la plantilla, súmalo a <code>FIXED_ASSET_PATHS</code> en <code>react/assets.ts</code> y corre <code>npm run assets:upload</code>. Si no, funciona en local y falla en Vercel.</p>
+<div class="callout"><span class="label">Decisión</span><p>La plantilla se hizo en React con <code>@react-pdf/renderer</code> y no en HTML con Chromium. La versión HTML rompía las curvas de los iconos, apilaba mal las capas y desfasaba el texto por diferencias de fuente. react-pdf calcula el layout por su cuenta, sin navegador, y da el mismo resultado cada vez.</p></div>
+</section>
+<section id="datos"><h2><span class="n">10</span>Datos</h2>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 675" style="min-width:600px" role="img" aria-label="Diagrama 8. Estados de una propuesta (columna status de proposals).">
+<defs><marker id="arr-states" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 300.0 113.0 L 300.0 149.0" class="edge" marker-end="url(#arr-states)"/>
+<path d="M 300.0 244.0 L 300.0 280.0" class="edge" marker-end="url(#arr-states)"/>
+<path d="M 430.0 339.5 L 520.0 339.5" class="edge" marker-end="url(#arr-states)"/>
+<path d="M 300.0 375.0 L 300.0 411.0" class="edge" marker-end="url(#arr-states)"/>
+<path d="M 170.0 470.5 L 97.0 470.5 Q 90.0 470.5 90.0 463.5 L 90.0 346.5 Q 90.0 339.5 97.0 339.5 L 170.0 339.5" class="edge" marker-end="url(#arr-states)"/>
+<path d="M 300.0 506.0 L 300.0 542.0" class="edge" marker-end="url(#arr-states)"/>
+<g class="node ">
+<text class="kind" x="170.0" y="33.0">ESTADO</text>
+<rect class="box" x="170.0" y="42.0" width="260" height="71.0" rx="3"/>
+<text class="title" x="184.0" y="66.0">draft</text>
+<text class="cap" x="184.0" y="82.0">La crea start_proposal.</text>
+</g>
+<g class="node ">
+<text class="kind" x="170.0" y="164.0">ESTADO</text>
+<rect class="box" x="170.0" y="173.0" width="260" height="71.0" rx="3"/>
+<text class="title" x="184.0" y="197.0">harvesting</text>
+<text class="cap" x="184.0" y="213.0">harvest_site_photos busca fotos.</text>
+</g>
+<g class="node ">
+<text class="kind" x="170.0" y="295.0">ESTADO</text>
+<rect class="box" x="170.0" y="304.0" width="260" height="71.0" rx="3"/>
+<text class="title" x="184.0" y="328.0">rendering</text>
+<text class="cap" x="184.0" y="344.0">render_proposal arma el PDF.</text>
+</g>
+<g class="node dashed">
+<text class="kind" x="520.0" y="295.0">ESTADO</text>
+<rect class="box" x="520.0" y="304.0" width="240" height="71.0" rx="3"/>
+<text class="title" x="534.0" y="328.0">failed</text>
+<text class="cap" x="534.0" y="344.0">El render falló o pasó de 8 MB.</text>
+</g>
+<g class="node ">
+<text class="kind" x="170.0" y="426.0">ESTADO</text>
+<rect class="box" x="170.0" y="435.0" width="260" height="71.0" rx="3"/>
+<text class="title" x="184.0" y="459.0">awaiting_approval</text>
+<text class="cap" x="184.0" y="475.0">El PDF ya está en el chat.</text>
+</g>
+<g class="node ">
+<text class="kind" x="170.0" y="557.0">ESTADO</text>
+<rect class="box" x="170.0" y="566.0" width="260" height="87.0" rx="3"/>
+<text class="title" x="184.0" y="590.0">delivered</text>
+<text class="cap" x="184.0" y="606.0">deliver_proposal con la versión</text>
+<text class="cap" x="184.0" y="622.0">aprobada.</text>
+</g>
+<text class="elabel" x="475.0" y="343.5" text-anchor="middle">error</text>
+<text class="elabel" x="90.0" y="409.0" text-anchor="middle">cambios: otra versión</text>
+<text class="elabel" x="300.0" y="528.0" text-anchor="middle">aprobada</text>
+</svg></div>
+<figcaption>Diagrama 8. Estados de una propuesta (columna status de proposals).</figcaption></figure>
+<div class="table-wrap"><table>
+<thead><tr><th>Tabla (schema propel)</th><th>Qué guarda</th></tr></thead>
+<tbody>
+<tr><td><code>proposals</code></td><td>Una fila por propuesta: nombre, posesivo, forma corta, sitio, <code>campus_mode</code> (single o network), fecha, <code>status</code>, <code>approved_version</code>, <code>ai_images_used</code>, <code>cowork_thread_id</code> y el error si falló.</td></tr>
+<tr><td><code>proposal_versions</code></td><td>Cada PDF generado: número de versión, ruta en Storage y peso.</td></tr>
+<tr><td><code>proposal_photos</code></td><td>Las fotos de cada espacio: <code>slot</code> (cover, mission, centralized), <code>source</code> (site, ai, upload) y cuál está seleccionada.</td></tr>
+<tr><td><code>proposal_events</code></td><td>Bitácora: created, site_harvested, photo_set, rendered, approved_and_delivered.</td></tr>
+<tr><td><code>inbound_messages</code></td><td>El messageId de cada mensaje que llegó de Scale, para no procesarlo dos veces.</td></tr>
+<tr><td><code>schema_migrations</code></td><td>Migraciones ya aplicadas.</td></tr>
+</tbody></table></div>
+<p>En Storage, el bucket privado <code>propel-proposals</code> guarda los PDFs como <code>{proposal_id}/v{n}.pdf</code> y los assets fijos en <code>_assets/</code>.</p>
+</section>
+<section id="tools"><h2><span class="n">11</span>Tools del agente</h2>
+<p>Una tool es una función que el modelo puede llamar. Viven en <code>agent/tools/</code>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Tool</th><th>Qué hace</th><th>Aprobación</th></tr></thead>
+<tbody>
+<tr><td><code>start_proposal</code></td><td>Crea la propuesta con nombre, variantes del nombre, sitio y campus o red. Si viene de Scale, guarda el id del hilo.</td><td>No</td></tr>
+<tr><td><code>harvest_site_photos</code></td><td>Lee la home y /about con Firecrawl y devuelve las fotos de 600 px o más, de mayor a menor.</td><td>No</td></tr>
+<tr><td><code>set_slot_photo</code></td><td>Asigna una foto (del sitio o una que mande el equipo) a un espacio.</td><td>No</td></tr>
+<tr><td><code>generate_ai_photo</code></td><td>Genera la foto de un espacio con gpt-image-2. Tope de 6 por propuesta.</td><td>No</td></tr>
+<tr><td><code>render_proposal</code></td><td>Arma el PDF con las 3 fotos, bloquea si pesa más de 8 MB y guarda una versión nueva.</td><td>No</td></tr>
+<tr><td><code>deliver_proposal</code></td><td>Marca la propuesta como entregada con la versión aprobada.</td><td>Siempre</td></tr>
+<tr><td><code>list_proposals</code></td><td>Lista las propuestas recientes con su estado.</td><td>No</td></tr>
+</tbody></table></div>
+<p>Además hay dos skills en <code>agent/skills/</code>: <code>photo-selection</code> (cómo elegir fotos) y <code>school-name-variants</code> (posesivos y formas cortas del nombre).</p>
+</section>
+<section id="canales"><h2><span class="n">12</span>Canales</h2>
+<h3>Telegram</h3>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 691" style="min-width:700px" role="img" aria-label="Diagrama 9. Telegram: quién puede hablar y cómo llegan los archivos.">
+<defs><marker id="arr-telegram" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 400.0 113.0 L 400.0 149.0" class="edge" marker-end="url(#arr-telegram)"/>
+<path d="M 400.0 244.0 L 400.0 255.0 Q 400.0 262.0 393.0 262.0 L 157.0 262.0 Q 150.0 262.0 150.0 269.0 L 150.0 280.0" class="edge" marker-end="url(#arr-telegram)"/>
+<path d="M 400.0 244.0 L 400.0 255.0 Q 400.0 262.0 407.0 262.0 L 553.0 262.0 Q 560.0 262.0 560.0 269.0 L 560.0 280.0" class="edge" marker-end="url(#arr-telegram)"/>
+<path d="M 560.0 375.0 L 560.0 411.0" class="edge" marker-end="url(#arr-telegram)"/>
+<path d="M 560.0 522.0 L 560.0 558.0" class="edge" marker-end="url(#arr-telegram)"/>
+<g class="node ">
+<text class="kind" x="240.0" y="33.0">ENTRADA</text>
+<rect class="box" x="240.0" y="42.0" width="320" height="71.0" rx="3"/>
+<text class="title" x="254.0" y="66.0">Mensaje en el chat del bot</text>
+<text class="cap" x="254.0" y="82.0">Telegram llama al webhook /eve/v1/telegram.</text>
+</g>
+<g class="node ">
+<text class="kind" x="210.0" y="164.0">DECISIÓN</text>
+<rect class="box" x="210.0" y="173.0" width="380" height="71.0" rx="3"/>
+<text class="title" x="224.0" y="197.0">¿El chat.id está en TELEGRAM_ALLOWED_CHAT_IDS?</text>
+<text class="cap" x="224.0" y="213.0">Si la variable está vacía, nadie entra.</text>
+</g>
+<g class="node dashed">
+<text class="kind" x="40.0" y="295.0">ESTADO</text>
+<rect class="box" x="40.0" y="304.0" width="220" height="71.0" rx="3"/>
+<text class="title" x="54.0" y="328.0">Se ignora</text>
+<text class="cap" x="54.0" y="344.0">El bot no responde.</text>
+</g>
+<g class="node ">
+<text class="kind" x="410.0" y="295.0">AGENTE</text>
+<rect class="box" x="410.0" y="304.0" width="300" height="71.0" rx="3"/>
+<text class="title" x="424.0" y="328.0">El agente atiende la conversación</text>
+<text class="cap" x="424.0" y="344.0">Busca fotos, genera y renderiza.</text>
+</g>
+<g class="node ">
+<text class="kind" x="395.0" y="426.0">SALIDA</text>
+<rect class="box" x="395.0" y="435.0" width="330" height="87.0" rx="3"/>
+<text class="title" x="409.0" y="459.0">Preview</text>
+<text class="cap" x="409.0" y="475.0">Se sube el PDF con el nombre Proposal - Escuela</text>
+<text class="cap" x="409.0" y="491.0">(preview v1).pdf.</text>
+</g>
+<g class="node ">
+<text class="kind" x="395.0" y="573.0">SALIDA</text>
+<rect class="box" x="395.0" y="582.0" width="330" height="87.0" rx="3"/>
+<text class="title" x="409.0" y="606.0">Entrega final</text>
+<text class="cap" x="409.0" y="622.0">PDF Proposal - Escuela.pdf y un mensaje con el</text>
+<text class="cap" x="409.0" y="638.0">link de 30 días.</text>
+</g>
+<text class="elabel" x="275.0" y="266.0" text-anchor="middle">no</text>
+<text class="elabel" x="480.0" y="266.0" text-anchor="middle">sí</text>
+<text class="elabel" x="560.0" y="544.0" text-anchor="middle">aprobado</text>
+</svg></div>
+<figcaption>Diagrama 9. Telegram: quién puede hablar y cómo llegan los archivos.</figcaption></figure>
+<p>El bot es <code>@trustedpropel_bot</code>. Telegram entrega los mensajes al webhook <code>/eve/v1/telegram</code> con un secret token. Para agregar a alguien o a un grupo, se suma su <code>chat.id</code> a <code>TELEGRAM_ALLOWED_CHAT_IDS</code>.</p>
+<h3>Scale CRM</h3>
+<p>El equipo habla con Propel en un canal tipo Slack (<code>#propel</code>), con hilos. Un hilo es una conversación y una sesión del agente, y puede producir varias propuestas. Si varias personas escriben en el mismo hilo, cada mensaje llega al agente como <code>[Nombre] texto</code> y Propel responde a cada quien por su nombre.</p>
+<figure class="diagram"><div class="canvas"><svg viewBox="0 0 800 1212" style="min-width:700px" role="img" aria-label="Diagrama 10. Un mensaje en #propel, de ida y de vuelta.">
+<defs><marker id="arr-scale" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1.5 L9 5 L1 8.5" class="arrow"/></marker></defs>
+<path d="M 140.0 129.0 L 140.0 165.0" class="edge" marker-end="url(#arr-scale)"/>
+<path d="M 255.0 232.5 L 263.0 232.5 Q 270.0 232.5 270.0 239.5 L 270.0 380.5 Q 270.0 387.5 277.0 387.5 L 285.0 387.5" class="edge" marker-end="url(#arr-scale)"/>
+<path d="M 515.0 387.5 L 523.0 387.5 Q 530.0 387.5 530.0 394.5 L 530.0 543.5 Q 530.0 550.5 537.0 550.5 L 545.0 550.5" class="edge" marker-end="url(#arr-scale)"/>
+<path d="M 660.0 602.0 L 660.0 638.0" class="edge" marker-end="url(#arr-scale)"/>
+<path d="M 660.0 749.0 L 660.0 785.0" class="edge" marker-end="url(#arr-scale)"/>
+<path d="M 545.0 852.5 L 537.0 852.5 Q 530.0 852.5 530.0 859.5 L 530.0 992.5 Q 530.0 999.5 523.0 999.5 L 515.0 999.5" class="edge" marker-end="url(#arr-scale)"/>
+<path d="M 285.0 999.5 L 277.0 999.5 Q 270.0 999.5 270.0 1006.5 L 270.0 1139.5 Q 270.0 1146.5 263.0 1146.5 L 255.0 1146.5" class="edge" marker-end="url(#arr-scale)"/>
+<g class="node human">
+<text class="kind" x="25.0" y="33.0">PERSONA</text>
+<rect class="box" x="25.0" y="42.0" width="230" height="87.0" rx="3"/>
+<text class="title" x="39.0" y="66.0">Escribe en #propel</text>
+<text class="cap" x="39.0" y="82.0">Por ejemplo: Hazme la proposal de</text>
+<text class="cap" x="39.0" y="98.0">Aspire, red de campus.</text>
+</g>
+<g class="node ">
+<text class="kind" x="25.0" y="180.0">SCALE</text>
+<rect class="box" x="25.0" y="189.0" width="230" height="87.0" rx="3"/>
+<text class="title" x="39.0" y="213.0">Guarda el mensaje</text>
+<text class="cap" x="39.0" y="229.0">Lo pone en agent_outbox para</text>
+<text class="cap" x="39.0" y="245.0">entregarlo con reintentos.</text>
+</g>
+<g class="node ">
+<text class="kind" x="285.0" y="327.0">EDGE FUNCTION</text>
+<rect class="box" x="285.0" y="336.0" width="230" height="103.0" rx="3"/>
+<text class="title" x="299.0" y="360.0">propel-dispatch</text>
+<text class="cap" x="299.0" y="376.0">POST a /cowork/message con</text>
+<text class="cap" x="299.0" y="392.0">messageId, threadId, autor y</text>
+<text class="cap" x="299.0" y="408.0">adjuntos.</text>
+</g>
+<g class="node ">
+<text class="kind" x="545.0" y="490.0">PROPEL</text>
+<rect class="box" x="545.0" y="499.0" width="230" height="103.0" rx="3"/>
+<text class="title" x="559.0" y="523.0">Recibe</text>
+<text class="cap" x="559.0" y="539.0">Verifica el secreto, descarta</text>
+<text class="cap" x="559.0" y="555.0">duplicados por messageId y</text>
+<text class="cap" x="559.0" y="571.0">responde 200.</text>
+</g>
+<g class="node ">
+<text class="kind" x="545.0" y="653.0">PROPEL</text>
+<rect class="box" x="545.0" y="662.0" width="230" height="87.0" rx="3"/>
+<text class="title" x="559.0" y="686.0">La sesión del hilo trabaja</text>
+<text class="cap" x="559.0" y="702.0">Corre las tools: fotos, render,</text>
+<text class="cap" x="559.0" y="718.0">aprobación.</text>
+</g>
+<g class="node ">
+<text class="kind" x="545.0" y="800.0">PROPEL</text>
+<rect class="box" x="545.0" y="809.0" width="230" height="87.0" rx="3"/>
+<text class="title" x="559.0" y="833.0">Responde en el hilo</text>
+<text class="cap" x="559.0" y="849.0">POST al webhook con el texto y el</text>
+<text class="cap" x="559.0" y="865.0">PDF como adjunto.</text>
+</g>
+<g class="node ">
+<text class="kind" x="285.0" y="947.0">EDGE FUNCTION</text>
+<rect class="box" x="285.0" y="956.0" width="230" height="87.0" rx="3"/>
+<text class="title" x="299.0" y="980.0">propel-webhook</text>
+<text class="cap" x="299.0" y="996.0">Valida el secreto, baja el PDF a</text>
+<text class="cap" x="299.0" y="1012.0">su Storage y guarda el mensaje.</text>
+</g>
+<g class="node ">
+<text class="kind" x="25.0" y="1094.0">SCALE</text>
+<rect class="box" x="25.0" y="1103.0" width="230" height="87.0" rx="3"/>
+<text class="title" x="39.0" y="1127.0">El hilo se actualiza</text>
+<text class="cap" x="39.0" y="1143.0">Se ve Propel está escribiendo, el</text>
+<text class="cap" x="39.0" y="1159.0">resumen y el PDF.</text>
+</g>
+</svg></div>
+<figcaption>Diagrama 10. Un mensaje en #propel, de ida y de vuelta.</figcaption></figure>
+<h4>Contrato: Scale a Propel</h4>
+<pre><code>POST https://propel-agent.vercel.app/cowork/message
+Authorization: Bearer &lt;PROPEL_TASK_WEBHOOK_SECRET&gt;
+
+{
+  "messageId": "id estable del mensaje",
+  "threadId":  "raíz del hilo (una sesión por hilo)",
+  "channelId": "id del canal",
+  "author":    { "id": "...", "name": "Andrés" },
+  "text":      "Hazme la proposal de Aspire Public Schools...",
+  "attachments": [{ "fileName": "...", "url": "https://...", "mimeType": "image/png" }]
+}
+→ 200 {"ok": true}</code></pre>
+<h4>Contrato: Propel a Scale</h4>
+<pre><code>POST {PROPEL_SCALE_WEBHOOK_URL}   (la función propel-webhook de Scale)
+Authorization: Bearer &lt;PROPEL_STATUS_WEBHOOK_SECRET&gt;
+
+{ "threadId": "...", "kind": "typing" }
+{ "threadId": "...", "kind": "message", "text": "...",
+   "attachments": [{ "fileName": "Proposal - X.pdf", "url": "...", "mimeType": "application/pdf" }] }</code></pre>
+<ul>
+<li>Scale entrega cada mensaje al menos una vez. Propel descarta repetidos con <code>messageId</code>.</li>
+<li>La palabra approve se manda sin envolver. Las variantes en español (aprobado, aprobada, aprobar) las traduce el canal.</li>
+<li>El link del adjunto dura 24 horas. Scale descarga el PDF a su propio Storage apenas lo recibe.</li>
+<li>Si el hilo no existe en Scale, el webhook responde 404 y Propel no reintenta.</li>
+</ul>
+</section>
+<section id="decisiones"><h2><span class="n">13</span>Decisiones y por qué</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Decisión</th><th>Por qué</th></tr></thead>
+<tbody>
+<tr><td>React-pdf en vez de HTML con Chromium</td><td>El HTML rompía curvas, capas y fuentes. React-pdf no depende de un navegador.</td></tr>
+<tr><td>Las tools no devuelven URLs firmadas</td><td>El modelo las reescribe con errores. Los canales firman y suben el archivo.</td></tr>
+<tr><td>Aprobación humana siempre</td><td>Es una propuesta comercial con precios. Nadie la entrega por error.</td></tr>
+<tr><td>Tope de 6 imágenes con IA</td><td>Controla el costo y evita que el agente regenere sin parar.</td></tr>
+<tr><td>Nada de stock</td><td>Riesgo con fotos de menores que parecen alumnos de la escuela.</td></tr>
+<tr><td>Supabase de LandingPilot con schema propio</td><td>El plan gratis no permite otro proyecto.</td></tr>
+<tr><td>Migraciones pegadas en el SQL Editor</td><td>No tenemos la cadena de conexión a la base. <code>scripts/setup-supabase.sql</code> reúne todo en un archivo. El runner <code>scripts/migrate.ts</code> existe por si algún día se tiene.</td></tr>
+<tr><td>Scale como interfaz, no una web propia</td><td>El equipo ya trabaja ahí.</td></tr>
+<tr><td>Hilos de conversación en vez de tarjetas Kanban</td><td>Se pide, se revisa y se corrige hablando, y varias personas pueden participar.</td></tr>
+<tr><td>Assets fijos en Storage</td><td>El bundle de Vercel no incluye archivos referenciados por ruta.</td></tr>
+</tbody></table></div>
+</section>
+<section id="seguridad"><h2><span class="n">14</span>Seguridad y límites</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Control</th><th>Cómo funciona</th></tr></thead>
+<tbody>
+<tr><td>Quién usa el bot</td><td>Lista de <code>chat.id</code> permitidos. Si la variable está vacía, el bot no acepta a nadie.</td></tr>
+<tr><td>Secretos</td><td>En <code>.env.local</code>, que git ignora, y en variables de Vercel marcadas como sensitive. Nunca en el código ni en el chat.</td></tr>
+<tr><td>Webhooks</td><td>Telegram con secret token. Scale con bearer secret y comparación en tiempo constante.</td></tr>
+<tr><td>Base de datos</td><td>RLS activo sin policies: solo el rol <code>service_role</code> tiene acceso al schema <code>propel</code>.</td></tr>
+<tr><td>Archivos</td><td>Bucket privado. Los links firmados duran 1 hora (preview en Telegram), 24 horas (adjuntos a Scale) o 30 días (entrega final).</td></tr>
+<tr><td>Tamaño del PDF</td><td>Máximo 8 MB.</td></tr>
+<tr><td>Imágenes con IA</td><td>Máximo 6 por propuesta.</td></tr>
+</tbody></table></div>
+</section>
+<section id="costos"><h2><span class="n">15</span>Costos y rendimiento</h2>
+<div class="grid">
+<div class="card"><h3>Medido</h3><ul>
+<li>Mensaje a preview: unos 40 segundos</li>
+<li>PDF de la prueba: 7 MB</li>
+<li>Fotos en la prueba: las 3 salieron del sitio, sin IA</li>
+</ul></div>
+<div class="card"><h3>Sin medir todavía</h3><ul>
+<li>Costo de modelo por propuesta</li>
+<li>Créditos de Firecrawl por propuesta (son 2 scrapes)</li>
+<li>Costo de las imágenes con IA</li>
+<li>Si el límite de tiempo de Vercel alcanza con 6 imágenes generadas</li>
+</ul></div>
+</div>
+<p>Cómo medir el costo: AI Gateway no da desglose por corrida en este plan, pero sí el saldo. Se lee el saldo, se hace una propuesta completa y se vuelve a leer. La diferencia es el costo de esa corrida, siempre que nadie más use la misma key.</p>
+</section>
+<section id="pendientes"><h2><span class="n">16</span>Pendientes por prioridad</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>#</th><th>Pendiente</th><th>Por qué importa</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Definir y aprobar las frases de campus único</td><td>Hoy solo cambian 2 frases. El resto del PDF dice red, y el cliente lo ve.</td></tr>
+<tr><td>2</td><td>Comprimir y recortar las fotos al tamaño del espacio</td><td>El PDF pesa unos 7 MB y el tope es 8. Una foto pesada bloquea la entrega.</td></tr>
+<tr><td>3</td><td>Revisar un PDF completo contra la plantilla original, con otra escuela</td><td>Solo se probó con Aspire.</td></tr>
+<tr><td>4</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
+<tr><td>5</td><td>Probar nombres difíciles</td><td>Posesivos como St. Mary's, nombres terminados en s y nombres muy largos en la portada.</td></tr>
+<tr><td>6</td><td>Medir el costo por propuesta</td><td>Hoy no se puede saber cuánto cuesta cada una.</td></tr>
+<tr><td>7</td><td>Evals para elegir el modelo</td><td>Hay un fixture de PROUD Academy en <code>evals/fixtures</code>. Falta armar los casos.</td></tr>
+<tr><td>8</td><td>Subir a git los cambios del repo de Scale</td><td>Los canales y las dos funciones están desplegados pero sin commit.</td></tr>
+<tr><td>9</td><td>Agregar el grupo de Telegram del equipo</td><td>Basta con sumar su <code>chat.id</code> a la lista permitida.</td></tr>
+<tr><td>10</td><td>Decidir si la aprobación en Scale puede ser de un solo mensaje</td><td>Hoy son dos: "aprobado" y approve.</td></tr>
+</tbody></table></div>
+</section>
+<section id="repo"><h2><span class="n">17</span>Repo y cómo correrlo</h2>
+<pre><code>proposal-creator/
+├─ agent/
+│  ├─ agent.ts            modelo y dependencias externas del build
+│  ├─ instructions.md     identidad y reglas del agente
+│  ├─ channels/           telegram.ts, cowork.ts (Scale)
+│  ├─ tools/              las 7 tools
+│  ├─ skills/             photo-selection, school-name-variants
+│  └─ lib/                db, supabase, scrape, aiImage, images, names, cowork
+├─ react/                 la plantilla del PDF
+│  ├─ pages/              una página (o grupo) por archivo
+│  ├─ buildProposal.tsx   arma el documento y lo renderiza
+│  └─ theme, fonts, icons, components, assets
+├─ db/migrations/         0001_init.sql, 0002_cowork.sql
+├─ scripts/               upload-assets.ts, migrate.ts, setup-supabase.sql
+├─ evals/fixtures/        casos de prueba (PROUD Academy)
+└─ docs/                  prompt de integración con Scale</code></pre>
+<h3>Comandos</h3>
+<pre><code>npm install
+npm run dev                   # agente en local con eve
+npx tsx react/render.tsx      # genera template/full-service/react-preview.pdf
+npm run typecheck
+npm run assets:upload         # sube los assets fijos a Storage
+npx eve deploy --non-interactive --yes</code></pre>
+<h3>Variables de entorno</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Variable</th><th>Para qué</th></tr></thead>
+<tbody>
+<tr><td><code>TELEGRAM_BOT_TOKEN</code>, <code>TELEGRAM_WEBHOOK_SECRET_TOKEN</code></td><td>Bot y verificación del webhook</td></tr>
+<tr><td><code>TELEGRAM_ALLOWED_CHAT_IDS</code></td><td>Chats permitidos, separados por coma</td></tr>
+<tr><td><code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>Base de datos y Storage</td></tr>
+<tr><td><code>AI_GATEWAY_API_KEY</code></td><td>Modelo e imágenes</td></tr>
+<tr><td><code>FIRECRAWL_API_KEY</code></td><td>Leer el sitio de la escuela</td></tr>
+<tr><td><code>PROPEL_TASK_WEBHOOK_SECRET</code></td><td>Autoriza a Scale a escribirle a Propel</td></tr>
+<tr><td><code>PROPEL_STATUS_WEBHOOK_SECRET</code></td><td>Autoriza a Propel a escribirle a Scale</td></tr>
+<tr><td><code>PROPEL_SCALE_WEBHOOK_URL</code> (opcional)</td><td>URL de propel-webhook, si cambia</td></tr>
+</tbody></table></div>
+</section>
+<section id="glosario"><h2><span class="n">18</span>Glosario</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Término</th><th>Significado</th></tr></thead>
+<tbody>
+<tr><td>eve</td><td>Framework de Vercel para agentes. Compila la carpeta <code>agent/</code> y la despliega.</td></tr>
+<tr><td>Tool</td><td>Función que el modelo puede llamar.</td></tr>
+<tr><td>Skill</td><td>Documento con criterios que el agente lee cuando le sirven.</td></tr>
+<tr><td>Canal</td><td>Por donde entra y sale la conversación (Telegram, Scale).</td></tr>
+<tr><td>Webhook</td><td>Una URL a la que otro servicio hace POST cuando pasa algo.</td></tr>
+<tr><td>Outbox</td><td>Tabla de mensajes pendientes de enviar, con reintentos si falla la entrega.</td></tr>
+<tr><td>URL firmada</td><td>Link temporal a un archivo privado, con un token que caduca.</td></tr>
+<tr><td>RLS</td><td>Row Level Security de Postgres. Sin policies, nadie accede salvo el rol de servicio.</td></tr>
+<tr><td>Hilo</td><td>Conversación en Scale. Equivale a una sesión del agente.</td></tr>
+</tbody></table></div>
+</section>
+<footer class="doc">Propel PRD · 03.10.26</footer>
+</div></div></main>
+</div>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('aside.side a'));
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var secs = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  function update() {
+    var cur = secs[0];
+    secs.forEach(function (s) { if (s.getBoundingClientRect().top < 140) cur = s; });
+    links.forEach(function (a) { a.classList.remove('active'); });
+    if (cur && map[cur.id]) map[cur.id].classList.add('active');
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+</script>
 </body>
 </html>

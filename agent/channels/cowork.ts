@@ -46,7 +46,11 @@ type Body = {
 };
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-const APPROVAL = /^(approve|aprobar|aprobado|aprobada)$/i;
+// eve solo resuelve una aprobación pendiente si el mensaje coincide EXACTO con
+// el id de la opción ("approve" / "cancel"). El equipo escribe en español, así
+// que las variantes comunes se traducen aquí antes de llegar a la sesión.
+const APPROVE = /^\s*(approve|approved|aprobar|aprobado|aprobada|apruebo|ok,? aprobado|s[ií],? aprobado?)\W*$/i;
+const CANCEL = /^\s*(cancel|cancelar|cancelado|rechazar|rechazado)\W*$/i;
 
 export default defineChannel({
   routes: [
@@ -78,11 +82,11 @@ export default defineChannel({
       // Aprobación: texto SIN envolver, o eve no lo empareja con la opción de
       // aprobar. El resto lleva el autor para que el modelo distinga a quién
       // le responde en un hilo con varias personas.
-      const plain = APPROVAL.test(text) && files.length === 0;
+      const decision = files.length === 0 ? (APPROVE.test(text) ? "approve" : CANCEL.test(text) ? "cancel" : null) : null;
       const attachmentNote = files.length
         ? `\n[Adjuntos: ${files.map((f) => `${f.fileName} (${f.mimeType || "?"}) ${f.url}`).join(" · ")}]`
         : "";
-      const message = plain ? text : `[${authorName}] ${text}${attachmentNote}`;
+      const message = decision ?? `[${authorName}] ${text}${attachmentNote}`;
 
       const auth = {
         authenticator: "cowork",
