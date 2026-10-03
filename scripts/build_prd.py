@@ -123,8 +123,26 @@ def d_arch():
     return d.svg()
 
 
+def d_modules():
+    d = Diagram("modules", "Diagrama 7. De la receta al PDF.", 700)
+    d.node("rec", 0, 330, 340, "Entrada", "Receta full-service", "Lista ordenada de 15 módulos, de la portada al acuerdo.")
+    d.node("plan", 1, 330, 340, "Paso", "Plan de esta propuesta", "Copia de la receta. Se puede insertar o quitar un módulo.")
+    d.node("ins", 1, 665, 230, "Persona", "La instrucción dice dónde", "Por ejemplo: los precios de red después de Pricing.")
+    d.node("val", 2, 330, 340, "Decisión", "¿Módulos conocidos y sin repetir?", "validatePlan")
+    d.node("err", 2, 665, 230, "Error", "No se renderiza", "Se devuelve qué está mal.", "dashed")
+    d.node("ph", 3, 330, 340, "Paso", "Fotos que pide el plan", "photoSlotsFor junta los espacios que declara cada módulo.")
+    d.node("pdf", 4, 330, 340, "Salida", "Cada módulo dibuja sus páginas", "El PDF sale en el orden del plan.")
+    d.edge("rec", "bottom", "plan", "top")
+    d.edge("ins", "left", "plan", "right")
+    d.edge("plan", "bottom", "val", "top")
+    d.edge("val", "right", "err", "left", "no")
+    d.edge("val", "bottom", "ph", "top", "sí")
+    d.edge("ph", "bottom", "pdf", "top")
+    return d.svg()
+
+
 def d_render():
-    d = Diagram("render", "Diagrama 7. Lo que hace render_proposal por dentro.", 700)
+    d = Diagram("render", "Diagrama 8. Lo que hace render_proposal por dentro.", 700)
     d.node("r1", 0, 400, 420, "Paso 1", "Lee la propuesta y baja las 3 fotos", "Las fotos elegidas se descargan de Storage.")
     d.node("r2", 1, 400, 420, "Paso 2", "ensureAssets", "Si faltan fuentes, logos o capturas en /tmp, las baja de Storage (carpeta _assets).")
     d.node("r3", 2, 400, 420, "Paso 3", "registerFonts y renderToBuffer", "react-pdf arma las 19 páginas en memoria.")
@@ -142,7 +160,7 @@ def d_render():
 
 
 def d_states():
-    d = Diagram("states", "Diagrama 8. Estados de una propuesta (columna status de proposals).", 600)
+    d = Diagram("states", "Diagrama 9. Estados de una propuesta (columna status de proposals).", 600)
     d.node("s1", 0, 300, 260, "Estado", "draft", "La crea start_proposal.")
     d.node("s2", 1, 300, 260, "Estado", "harvesting", "harvest_site_photos busca fotos.")
     d.node("s3", 2, 300, 260, "Estado", "rendering", "render_proposal arma el PDF.")
@@ -159,7 +177,7 @@ def d_states():
 
 
 def d_telegram():
-    d = Diagram("telegram", "Diagrama 9. Telegram: quién puede hablar y cómo llegan los archivos.", 700)
+    d = Diagram("telegram", "Diagrama 10. Telegram: quién puede hablar y cómo llegan los archivos.", 700)
     d.node("m", 0, 400, 320, "Entrada", "Mensaje en el chat del bot", "Telegram llama al webhook /eve/v1/telegram.")
     d.node("al", 1, 400, 380, "Decisión", "¿El chat.id está en TELEGRAM_ALLOWED_CHAT_IDS?", "Si la variable está vacía, nadie entra.")
     d.node("no", 2, 150, 220, "Estado", "Se ignora", "El bot no responde.", "dashed")
@@ -175,7 +193,7 @@ def d_telegram():
 
 
 def d_scale():
-    d = Diagram("scale", "Diagrama 10. Un mensaje en #proposals, de ida y de vuelta.", 700)
+    d = Diagram("scale", "Diagrama 11. Un mensaje en #proposals, de ida y de vuelta.", 700)
     d.node("p", 0, 140, 230, "Persona", "Escribe en #proposals", "Por ejemplo: Hazme la proposal de Aspire, red de campus.")
     d.node("db", 1, 140, 230, "Scale", "Guarda el mensaje", "Lo pone en agent_outbox para entregarlo con reintentos.")
     d.node("disp", 2, 400, 230, "Edge function", "propel-dispatch", "POST a /cowork/message con messageId, threadId, autor y adjuntos.")
@@ -318,6 +336,12 @@ section("arquitectura", "Arquitectura", f"""
 """)
 
 section("pdf", "Cómo se genera el PDF", f"""
+<h3>Módulos y recetas</h3>
+<p>La plantilla está partida en 15 <strong>módulos</strong>: uno por página, salvo el acuerdo, que fluye en varias. Una <strong>receta</strong> es la lista ordenada de módulos que forma una variante de propuesta. Hoy hay una sola, <code>full-service</code>, que produce las 19 páginas de siempre. Crear una variante (por ejemplo, para una red con precios propios) es escribir otra lista, no copiar páginas.</p>
+{d_modules()}
+<p>Cada módulo declara su id, título, descripción, cuántas páginas ocupa y qué espacios de foto necesita. <code>render_proposal</code> pide solo las fotos que declaran los módulos del plan.</p>
+<div class="callout"><span class="label">Estado</span><p>Hoy toda propuesta usa la receta completa, sin ajustes. Guardar un plan por propuesta y que el agente lo ajuste según la instrucción es el siguiente paso (sección 16). El cambio a módulos se comprobó renderizando antes y después: las 19 páginas salen idénticas, en texto y en píxeles.</p></div>
+<h3>Render</h3>
 {d_render()}
 <h3>Las 19 páginas</h3>
 <div class="table-wrap"><table>
@@ -426,6 +450,7 @@ section("decisiones", "Decisiones y por qué", """
 <tr><td>Migraciones pegadas en el SQL Editor</td><td>No tenemos la cadena de conexión a la base. <code>scripts/setup-supabase.sql</code> reúne todo en un archivo. El runner <code>scripts/migrate.ts</code> existe por si algún día se tiene.</td></tr>
 <tr><td>Scale como interfaz, no una web propia</td><td>El equipo ya trabaja ahí.</td></tr>
 <tr><td>Hilos de conversación en vez de tarjetas Kanban</td><td>Se pide, se revisa y se corrige hablando, y varias personas pueden participar.</td></tr>
+<tr><td>Plantilla en módulos y recetas</td><td>Las variantes (red, campus único, hojas extra de un trato) se arman como listas de módulos, sin duplicar páginas.</td></tr>
 <tr><td>Assets fijos en Storage</td><td>El bundle de Vercel no incluye archivos referenciados por ruta.</td></tr>
 </tbody></table></div>
 """)
@@ -466,15 +491,17 @@ section("pendientes", "Pendientes por prioridad", """
 <thead><tr><th>#</th><th>Pendiente</th><th>Por qué importa</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Definir y aprobar las frases de campus único</td><td>Hoy solo cambian 2 frases. El resto del PDF dice red, y el cliente lo ve.</td></tr>
-<tr><td>2</td><td>Comprimir y recortar las fotos al tamaño del espacio</td><td>El PDF pesa unos 7 MB y el tope es 8. Una foto pesada bloquea la entrega.</td></tr>
-<tr><td>3</td><td>Revisar un PDF completo contra la plantilla original, con otra escuela</td><td>Solo se probó con Aspire.</td></tr>
-<tr><td>4</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
-<tr><td>5</td><td>Probar nombres difíciles</td><td>Posesivos como St. Mary's, nombres terminados en s y nombres muy largos en la portada.</td></tr>
-<tr><td>6</td><td>Medir el costo por propuesta</td><td>Hoy no se puede saber cuánto cuesta cada una.</td></tr>
-<tr><td>7</td><td>Evals para elegir el modelo</td><td>Hay un fixture de PROUD Academy en <code>evals/fixtures</code>. Falta armar los casos.</td></tr>
-<tr><td>8</td><td>Subir a git los cambios del repo de Scale</td><td>Los canales y las dos funciones están desplegados pero sin commit.</td></tr>
-<tr><td>9</td><td>Agregar el grupo de Telegram del equipo</td><td>Basta con sumar su <code>chat.id</code> a la lista permitida.</td></tr>
-<tr><td>10</td><td>Decidir si la aprobación en Scale puede ser de un solo mensaje</td><td>Hoy son dos: "aprobado" y approve.</td></tr>
+<tr><td>2</td><td>Módulos de red a partir de las hojas de Noble Schools</td><td>Precios por red con cálculo en código (el precio por campus es de cada trato), servicios incluidos, reportes de distrito y términos.</td></tr>
+<tr><td>3</td><td>Guardar el plan por propuesta y que el agente lo ajuste</td><td>Para insertar una hoja donde la instrucción lo pida y para elegir otra receta.</td></tr>
+<tr><td>4</td><td>Comprimir y recortar las fotos al tamaño del espacio</td><td>El PDF pesa unos 7 MB y el tope es 8. Una foto pesada bloquea la entrega.</td></tr>
+<tr><td>5</td><td>Revisar un PDF completo contra la plantilla original, con otra escuela</td><td>Solo se probó con Aspire.</td></tr>
+<tr><td>6</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
+<tr><td>7</td><td>Probar nombres difíciles</td><td>Posesivos como St. Mary's, nombres terminados en s y nombres muy largos en la portada.</td></tr>
+<tr><td>8</td><td>Medir el costo por propuesta</td><td>Hoy no se puede saber cuánto cuesta cada una.</td></tr>
+<tr><td>9</td><td>Evals para elegir el modelo</td><td>Hay un fixture de PROUD Academy en <code>evals/fixtures</code>. Falta armar los casos.</td></tr>
+<tr><td>10</td><td>Subir a git los cambios del repo de Scale</td><td>Los canales y las dos funciones están desplegados pero sin commit.</td></tr>
+<tr><td>11</td><td>Agregar el grupo de Telegram del equipo</td><td>Basta con sumar su <code>chat.id</code> a la lista permitida.</td></tr>
+<tr><td>12</td><td>Decidir si la aprobación en Scale puede ser de un solo mensaje</td><td>Hoy son dos: "aprobado" y approve.</td></tr>
 </tbody></table></div>
 """)
 
@@ -488,7 +515,9 @@ section("repo", "Repo y cómo correrlo", """
 │  ├─ skills/             photo-selection, school-name-variants
 │  └─ lib/                db, supabase, scrape, aiImage, images, names, cowork
 ├─ react/                 la plantilla del PDF
-│  ├─ pages/              una página (o grupo) por archivo
+│  ├─ pages/              el diseño de cada página
+│  ├─ modules/            registro de módulos: datos, fotos y render
+│  ├─ recipes.ts          recetas (variantes) y planes
 │  ├─ buildProposal.tsx   arma el documento y lo renderiza
 │  └─ theme, fonts, icons, components, assets
 ├─ db/migrations/         0001_init.sql, 0002_cowork.sql

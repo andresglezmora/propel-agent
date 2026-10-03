@@ -11,6 +11,8 @@ import {
   downloadFromBucket,
 } from "#lib/db";
 import { renderProposalPdf } from "../../react/buildProposal";
+import { photoSlotsFor, planFromRecipe } from "../../react/recipes";
+import type { PhotoSlotId } from "../../react/modules/types";
 
 function formatDate(d: string) {
   return new Date(`${d}T00:00:00Z`).toLocaleDateString("en-US", {
@@ -30,8 +32,13 @@ export default defineTool({
     const proposal = await getProposal(proposalId);
     if (!proposal) return { error: `La propuesta ${proposalId} no existe.` };
 
+    // Por ahora toda propuesta usa la receta full-service. Las fotos que se
+    // piden salen del plan: cada módulo declara sus espacios.
+    const plan = planFromRecipe();
+    const slots = photoSlotsFor(plan).map((s) => s.slot);
+
     const photos = await getSelectedPhotos(proposalId);
-    const missing = (["cover", "mission", "centralized"] as const).filter((slot) => !photos[slot]?.storage_path);
+    const missing = slots.filter((slot) => !photos[slot]?.storage_path);
     if (missing.length > 0) {
       return {
         error: `Faltan fotos para: ${missing.join(", ")}. Usa harvest_site_photos + set_slot_photo, o generate_ai_photo, antes de renderizar.`,
@@ -40,11 +47,8 @@ export default defineTool({
 
     await updateProposal(proposalId, { status: "rendering" });
 
-    const [coverBytes, missionBytes, centralizedBytes] = await Promise.all([
-      downloadFromBucket(photos.cover!.storage_path!),
-      downloadFromBucket(photos.mission!.storage_path!),
-      downloadFromBucket(photos.centralized!.storage_path!),
-    ]);
+    const downloaded = await Promise.all(slots.map((slot) => downloadFromBucket(photos[slot]!.storage_path!)));
+    const photoBytes = Object.fromEntries(slots.map((slot, i) => [slot, downloaded[i]])) as Record<PhotoSlotId, Buffer>;
 
     let pdfBytes: Buffer;
     try {
@@ -53,8 +57,8 @@ export default defineTool({
         schoolPossessive: proposal.school_possessive,
         date: formatDate(proposal.proposal_date),
         campusMode: proposal.campus_mode,
-        photos: { cover: coverBytes, mission: missionBytes, centralized: centralizedBytes },
-      });
+        photos: photoBytes,
+      }, plan);
     } catch (err) {
       await updateProposal(proposalId, { status: "failed", error: (err as Error).message });
       return { error: `Falló el render: ${(err as Error).message}` };
