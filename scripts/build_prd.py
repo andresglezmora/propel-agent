@@ -3,6 +3,7 @@
 
 Uso: python3 scripts/build_prd.py
 """
+import re
 import sys
 from pathlib import Path
 
@@ -28,7 +29,7 @@ def d_overview():
 
 
 def d_flow():
-    d = Diagram("flow", "Diagrama 2. Los pasos de una propuesta. Cada recuadro de tipo Tool es una función del agente (sección 11).", 700)
+    d = Diagram("flow", "Diagrama 2. Los pasos de una propuesta. Cada recuadro de tipo Tool es una función del agente (sección 12).", 700)
     d.node("start", 0, 300, 300, "Tool", "start_proposal", "Crea el registro: nombre, posesivo, sitio y campus o red.")
     d.node("harv", 1, 300, 300, "Tool", "harvest_site_photos", "Firecrawl lee la home y /about y devuelve las fotos de 600 px o más.")
     d.node("dec", 2, 300, 300, "Decisión", "¿El sitio tiene foto útil para cada espacio?")
@@ -141,6 +142,51 @@ def d_modules():
     return d.svg()
 
 
+def d_variants():
+    d = Diagram("variants", "Diagrama 0. Una propuesta con variantes, de la petición al PDF.", 700)
+    d.node("req", 0, 400, 360, "Entrada", "Petición", "Escuela, sitio, modalidad y, si aplica, hojas extra y dónde van.")
+    d.node("net", 1, 400, 360, "Decisión", "¿Piden hojas de red o precios por campus?")
+    d.node("rn", 2, 215, 270, "Tool", "start_proposal: full-service-network", "Agrega precios por red y qué incluye después de la página 5.")
+    d.node("rb", 2, 585, 270, "Tool", "start_proposal: full-service", "Las 19 páginas de siempre.")
+    d.node("extra", 3, 400, 360, "Decisión", "¿Hay hojas extra o en otro lugar?")
+    d.node("plan", 4, 615, 290, "Tool", "update_plan", "Inserta, mueve o quita módulos. Una página nueva es custom:<slug>.")
+    d.node("content", 5, 400, 360, "Tool", "set_module_content", "Cifras del equipo. Texto del equipo, el de por defecto o propuesto por el modelo.")
+    d.node("check", 6, 400, 360, "Decisión", "¿Contenido válido y cada hoja cabe en 1 página?")
+    d.node("fix", 6, 690, 200, "Error", "Se dice qué corregir", "Campo, límite o cuánto sobra.", "dashed")
+    d.node("out", 7, 400, 360, "Salida", "render_proposal", "PDF al chat. Si hay texto propuesto por el modelo, se avisa.")
+    d.edge("req", "bottom", "net", "top")
+    d.edge("net", "bottom", "rn", "top", "sí")
+    d.edge("net", "bottom", "rb", "top", "no")
+    d.edge("rn", "bottom", "extra", "top")
+    d.edge("rb", "bottom", "extra", "top")
+    d.edge("extra", "right", "plan", "top", "sí")
+    d.edge("plan", "bottom", "content", "right")
+    d.edge("extra", "bottom", "content", "top", "no")
+    d.edge("content", "bottom", "check", "top")
+    d.edge("check", "right", "fix", "left", "no")
+    d.edge("fix", "top", "content", "right", k=30)
+    d.edge("check", "bottom", "out", "top", "sí")
+    return d.svg()
+
+
+def d_content():
+    d = Diagram("content", "Diagrama 0. Quién escribe cada contenido de un módulo.", 700)
+    d.node("num", 0, 400, 300, "Decisión", "¿Es una cifra?", "Precio por campus, número de campus, opciones.")
+    d.node("team1", 1, 170, 260, "Persona", "La da el equipo", "Nunca la inventa el modelo. Sin ella no se renderiza.")
+    d.node("txt", 1, 590, 280, "Decisión", "¿El equipo dio el texto?")
+    d.node("team2", 2, 455, 230, "Tool", "Tal cual, source team", "No se \"mejora\". Si no cabe, se pide recortar.")
+    d.node("ask", 2, 700, 180, "Decisión", "¿Piden redactarlo?")
+    d.node("def", 3, 535, 170, "Estado", "Texto por defecto", "El de Noble con el nombre de la escuela.")
+    d.node("ai", 3, 710, 160, "Agente", "Lo redacta el modelo", "source ai. Se avisa al revisar.")
+    d.edge("num", "bottom", "team1", "top", "sí")
+    d.edge("num", "bottom", "txt", "top", "no")
+    d.edge("txt", "bottom", "team2", "top", "sí")
+    d.edge("txt", "bottom", "ask", "top", "no")
+    d.edge("ask", "bottom", "def", "top", "no")
+    d.edge("ask", "bottom", "ai", "top", "sí")
+    return d.svg()
+
+
 def d_render():
     d = Diagram("render", "Diagrama 8. Lo que hace render_proposal por dentro.", 700)
     d.node("r1", 0, 400, 420, "Paso 1", "Lee la propuesta y baja las 3 fotos", "Las fotos elegidas se descargan de Storage.")
@@ -222,7 +268,8 @@ def section(id, title, body):
 
 
 section("resumen", "Qué es Propel", f"""
-<p>Propel es un agente que genera la propuesta comercial <strong>TrustED Full-Service</strong> en PDF. Le dices el nombre de la escuela, su sitio web y si es un campus o una red de campus. Propel busca las fotos, arma el PDF de 19 páginas y lo manda al chat para que una persona lo revise y lo apruebe.</p>
+<p>Propel es un agente que genera la propuesta comercial <strong>TrustED Full-Service</strong> en PDF. Le dices el nombre de la escuela, su sitio web y si es un campus o una red de campus. Propel busca las fotos, arma el PDF y lo manda al chat para que una persona lo revise y lo apruebe.</p>
+<p>La base son las 19 páginas de la plantilla. Además puede armar <strong>variantes</strong>: agregar las hojas de trato para redes (precios por número de campus, qué incluye, reportes de distrito y términos), poner una hoja donde lo pida la instrucción o crear una página a la medida con los bloques del sistema visual.</p>
 <p>Está hecho con <strong>eve</strong>, el framework de Vercel para agentes: un agente es una carpeta de archivos (instrucciones, tools, canales, skills) que eve compila y despliega. Vive en Vercel y se usa por Telegram y por un canal de Scale CRM.</p>
 {d_overview()}
 <p>En la prueba con Aspire Public Schools pasaron unos 40 segundos entre el mensaje y el PDF de preview.</p>
@@ -235,12 +282,12 @@ section("problema", "Problema y objetivo", """
 <p>Dar nombre, sitio web y modalidad, y recibir un PDF idéntico a la plantilla, sin tocar el diseño ni el texto.</p>
 <h3>Cómo sabemos que funciona</h3>
 <ul>
-<li>El PDF tiene las 19 páginas de la plantilla y solo cambia lo que lista la sección 3.</li>
+<li>El PDF tiene las páginas de su receta y solo cambia lo que listan las secciones 3 y 6.</li>
 <li>Pesa menos de 8 MB. Si pasa, el render se bloquea.</li>
 <li>Ninguna propuesta se entrega sin que una persona la apruebe.</li>
 <li>Del mensaje al preview pasa menos de un minuto. Medido: 15:03:42 el mensaje, 15:04:21 el PDF.</li>
 </ul>
-<div class="callout"><span class="label">Regla central</span><p>Propel nunca reescribe el texto de la propuesta. Solo rellena los campos que cambian entre escuelas.</p></div>
+<div class="callout"><span class="label">Regla central</span><p>El texto de los módulos fijos (pilares, testimonios, precios de planes, contrato) nunca se reescribe. Las hojas de trato aceptan texto del equipo, usan uno por defecto o, si se lo piden, el modelo propone uno, que queda marcado para revisión. Las cifras siempre las da el equipo.</p></div>
 """)
 
 section("cambia", "Qué cambia en cada propuesta", """
@@ -253,9 +300,10 @@ section("cambia", "Qué cambia en cada propuesta", """
 <tr><td>Foto de portada</td><td>Página 1</td><td>Sitio de la escuela, o IA si el sitio no sirve.</td></tr>
 <tr><td>Foto de misión</td><td>Página 2</td><td>Igual.</td></tr>
 <tr><td>Foto de Centralized Enrollment</td><td>Página 4</td><td>Igual.</td></tr>
+<tr><td>Hojas de trato y páginas a la medida</td><td>Donde las ponga el plan</td><td>Cifras del equipo; texto del equipo, por defecto o propuesto por el modelo (sección 6).</td></tr>
 <tr><td>Campus único</td><td>Portada y página 3</td><td>Se quita "Network-wide" de la portada y " across all campuses" de la página 3.</td></tr>
 </tbody></table></div>
-<div class="callout"><span class="label">Pendiente</span><p>Hoy solo se adaptan esas dos frases para un campus único. El resto del PDF habla de red. La lista completa de frases por cambiar falta definirla y aprobarla (sección 16).</p></div>
+<div class="callout"><span class="label">Pendiente</span><p>Hoy solo se adaptan esas dos frases para un campus único. El resto del PDF habla de red. La lista completa de frases por cambiar falta definirla y aprobarla (sección 17).</p></div>
 """)
 
 section("alcance", "Alcance", """
@@ -266,13 +314,15 @@ section("alcance", "Alcance", """
 <li>Fotos desde el sitio de la escuela (Firecrawl)</li>
 <li>Imágenes con IA cuando el sitio no sirve, máximo 6</li>
 <li>PDF de la plantilla Full-Service, 19 páginas</li>
+<li>Variantes: recetas, hojas en el lugar que pida la instrucción y páginas a la medida</li>
 <li>Aprobación humana antes de entregar</li>
 <li>Versiones: cada render guarda v1, v2, v3</li>
 <li>Link de descarga de 30 días</li>
 </ul></div>
 <div class="card"><h3>Fuera de V1</h3><ul>
-<li>Otras plantillas que no sean Full-Service</li>
-<li>Editar el texto de la propuesta</li>
+<li>Otras plantillas base que no sean Full-Service (las variantes parten de ella)</li>
+<li>Editar el texto de los módulos fijos</li>
+<li>Una interfaz en Scale para armar recetas (hoy se guardan desde el chat)</li>
 <li>Fotos de stock</li>
 <li>Una interfaz web propia: Scale la reemplaza</li>
 <li>Enviar la propuesta por correo a la escuela</li>
@@ -285,11 +335,38 @@ section("flujo", "Flujo de una propuesta", f"""
 {d_flow()}
 <ol>
 <li><strong>Datos.</strong> Si falta el sitio, o no queda claro si es un campus o una red, el agente lo pregunta antes de crear nada.</li>
-<li><strong>Fotos.</strong> Primero el sitio de la escuela. La IA solo entra si el sitio no tiene nada útil (sección 6).</li>
+<li><strong>Fotos.</strong> Primero el sitio de la escuela. La IA solo entra si el sitio no tiene nada útil (sección 7).</li>
 <li><strong>Render.</strong> Se genera una versión nueva en cada llamada. Nunca se sobrescribe la anterior.</li>
 <li><strong>Cambios.</strong> Si piden otra foto, se corrige solo ese espacio y se vuelve a renderizar.</li>
-<li><strong>Entrega.</strong> Solo con aprobación humana (sección 7).</li>
+<li><strong>Entrega.</strong> Solo con aprobación humana (sección 8).</li>
 </ol>
+""")
+
+section("variantes", "Variantes de propuesta", f"""
+<p>Una propuesta es una <strong>receta</strong> (lista ordenada de módulos) que se puede ajustar para cada trato. El plan ajustado y el contenido de cada módulo se guardan en la propuesta, así que una versión nueva parte de lo último que se pidió.</p>
+{d_variants()}
+<h3>Recetas</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Receta</th><th>Qué es</th><th>Necesita</th></tr></thead>
+<tbody>
+<tr><td><code>full-service</code></td><td>Las 19 páginas de siempre.</td><td>Nombre, sitio, modalidad, 3 fotos.</td></tr>
+<tr><td><code>full-service-network</code></td><td>Lo mismo más las dos hojas de red después de la página 5 (21 páginas).</td><td>Además, las opciones de precio del trato.</td></tr>
+<tr><td>Guardadas</td><td>Las que el equipo guarda desde el chat con <code>save_recipe</code> (tabla <code>propel.recipes</code>).</td><td>Lo que pidan sus módulos.</td></tr>
+</tbody></table></div>
+<h3>Hojas de red</h3>
+<p>Salen de las hojas que se hicieron a mano para Noble Schools, con el mismo diseño. <code>network-pricing</code> lleva hasta 3 opciones (número de campus y precio por campus) y calcula los totales. <code>network-includes</code> lleva servicios incluidos, reportes de distrito y términos, y toma el número de campus de la hoja de precios. Todo su texto tiene un valor por defecto, que es el de Noble con el nombre de la escuela.</p>
+<h3>Quién escribe qué</h3>
+{d_content()}
+<h3>Páginas a la medida</h3>
+<p>Cuando un trato pide contenido que no cabe en ningún módulo, se inserta <code>custom:&lt;slug&gt;</code> donde lo pida la instrucción y se llena con un título y de 1 a 8 bloques del sistema visual: <code>section</code>, <code>paragraphs</code>, <code>numbered</code>, <code>cards</code>, <code>panel</code>, <code>callout</code>, <code>terms</code> y <code>prices</code>. No se diseña nada nuevo: los bloques son los mismos de las hojas de Noble y cada uno tiene límites de texto.</p>
+<h3>Reglas que se validan en código</h3>
+<ul>
+<li>Cada campo tiene un límite de caracteres. Si no se cumple, la tool dice qué campo y cuál es el límite.</li>
+<li>Cada hoja con contenido se renderiza sola antes del PDF final y debe ocupar exactamente 1 página.</li>
+<li>Solo una opción de precio puede ser la recomendada.</li>
+<li>La palabra en coral del título (<code>titleAccent</code>) no puede repetirse dentro del título.</li>
+<li>Nada se inserta entre la portada del contrato y el contrato: "antes del contrato" es antes de <code>agreement-cover</code>.</li>
+</ul>
 """)
 
 section("fotos", "Fotos", f"""
@@ -309,6 +386,7 @@ section("fotos", "Fotos", f"""
 <li>Máximo 6 generaciones por propuesta, contando las regeneraciones. Al llegar al tope, la tool devuelve un error a propósito y el agente pide una foto al equipo.</li>
 <li>No se usan fotos de stock. Una foto de stock con menores presentada como alumnos de la escuela es un riesgo que no se corre.</li>
 </ul>
+<p>Una misma foto no puede ir en dos espacios: <code>set_slot_photo</code> lo rechaza. La búsqueda descarta gráficos con texto encima cuando el nombre del archivo lo indica (portadas de blog, banners, flyers). Antes de entrar al PDF, cada foto se reduce al tamaño que ocupa (1600 px la portada, 1200 las demás) y se pasa a JPEG.</p>
 <p>El filtro de la tool de búsqueda es de 600 px. Los mínimos de 1200 y 800 los aplica el agente siguiendo la skill <code>photo-selection</code>.</p>
 """)
 
@@ -332,15 +410,14 @@ section("arquitectura", "Arquitectura", f"""
 <tr><td>Supabase</td><td>Base de datos (schema <code>propel</code>) y Storage (bucket privado <code>propel-proposals</code>).</td><td><code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code></td></tr>
 <tr><td>react-pdf</td><td>Genera el PDF en memoria dentro de la función. No hay navegador.</td><td>Sin servicio externo</td></tr>
 </tbody></table></div>
-<div class="callout"><span class="label">Supabase compartido</span><p>El plan gratis no permite otro proyecto, así que Propel usa el de LandingPilot, aislado en su propio schema. La sección 14 explica cómo se protege.</p></div>
+<div class="callout"><span class="label">Supabase compartido</span><p>El plan gratis no permite otro proyecto, así que Propel usa el de LandingPilot, aislado en su propio schema. La sección 15 explica cómo se protege.</p></div>
 """)
 
 section("pdf", "Cómo se genera el PDF", f"""
 <h3>Módulos y recetas</h3>
-<p>La plantilla está partida en 15 <strong>módulos</strong>: uno por página, salvo el acuerdo, que fluye en varias. Una <strong>receta</strong> es la lista ordenada de módulos que forma una variante de propuesta. Hoy hay una sola, <code>full-service</code>, que produce las 19 páginas de siempre. Crear una variante (por ejemplo, para una red con precios propios) es escribir otra lista, no copiar páginas.</p>
+<p>La plantilla está partida en <strong>módulos</strong>: los 15 de la plantilla base (uno por página, salvo el contrato, que fluye en varias), las 2 hojas de red y las páginas a la medida. Una <strong>receta</strong> es la lista ordenada de módulos que forma una variante. Crear una variante es escribir otra lista, no copiar páginas.</p>
 {d_modules()}
-<p>Cada módulo declara su id, título, descripción, cuántas páginas ocupa y qué espacios de foto necesita. <code>render_proposal</code> pide solo las fotos que declaran los módulos del plan.</p>
-<div class="callout"><span class="label">Estado</span><p>Hoy toda propuesta usa la receta completa, sin ajustes. Guardar un plan por propuesta y que el agente lo ajuste según la instrucción es el siguiente paso (sección 16). El cambio a módulos se comprobó renderizando antes y después: las 19 páginas salen idénticas, en texto y en píxeles.</p></div>
+<p>Cada módulo declara su id, título, descripción, cuántas páginas ocupa, qué espacios de foto necesita y, si acepta contenido, su esquema con límites y su texto por defecto. <code>render_proposal</code> pide solo las fotos que declaran los módulos del plan.</p>
 <h3>Render</h3>
 {d_render()}
 <h3>Las 19 páginas</h3>
@@ -366,6 +443,8 @@ section("pdf", "Cómo se genera el PDF", f"""
 <li>El duotono solo va en la foto de portada.</li>
 <li>Las imágenes de Lead Generation y CMO Strategy usan <code>objectFit: "contain"</code> y fondo blanco: no se recortan.</li>
 </ul>
+<h3>Peso del PDF</h3>
+<p>Las capturas y fotos fijas de la plantilla se guardan en JPEG optimizado (<code>template/full-service/optimized/</code>, generadas con <code>scripts/optimize-assets.ts</code>): pasaron de 4.9 MB a 0.8 MB. El PDF base bajó de 7.5 MB a 2.9 MB, y una propuesta de red con página a la medida pesa unos 2.4 MB. El tope sigue en 8 MB.</p>
 <h3>Assets fijos</h3>
 <p>Fuentes, logos y capturas viven en Storage, carpeta <code>_assets/</code>. En Vercel el bundle no incluye archivos que se referencian por ruta, así que se descargan a <code>/tmp</code> la primera vez que una instancia los necesita. Si agregas un asset a la plantilla, súmalo a <code>FIXED_ASSET_PATHS</code> en <code>react/assets.ts</code> y corre <code>npm run assets:upload</code>. Si no, funciona en local y falla en Vercel.</p>
 <div class="callout"><span class="label">Decisión</span><p>La plantilla se hizo en React con <code>@react-pdf/renderer</code> y no en HTML con Chromium. La versión HTML rompía las curvas de los iconos, apilaba mal las capas y desfasaba el texto por diferencias de fuente. react-pdf calcula el layout por su cuenta, sin navegador, y da el mismo resultado cada vez.</p></div>
@@ -379,7 +458,9 @@ section("datos", "Datos", f"""
 <tr><td><code>proposals</code></td><td>Una fila por propuesta: nombre, posesivo, forma corta, sitio, <code>campus_mode</code> (single o network), fecha, <code>status</code>, <code>approved_version</code>, <code>ai_images_used</code>, <code>cowork_thread_id</code> y el error si falló.</td></tr>
 <tr><td><code>proposal_versions</code></td><td>Cada PDF generado: número de versión, ruta en Storage y peso.</td></tr>
 <tr><td><code>proposal_photos</code></td><td>Las fotos de cada espacio: <code>slot</code> (cover, mission, centralized), <code>source</code> (site, ai, upload) y cuál está seleccionada.</td></tr>
-<tr><td><code>proposal_events</code></td><td>Bitácora: created, site_harvested, photo_set, rendered, approved_and_delivered.</td></tr>
+<tr><td><code>proposals</code> (variantes)</td><td><code>recipe</code> (id de receta), <code>plan</code> (lista de módulos si se ajustó; vacío = la receta tal cual) y <code>module_data</code> (contenido por módulo con su origen: team o ai).</td></tr>
+<tr><td><code>recipes</code></td><td>Recetas guardadas por el equipo: id, título, descripción y lista de módulos.</td></tr>
+<tr><td><code>proposal_events</code></td><td>Bitácora: created, site_harvested, photo_set, plan_updated, module_content_set, rendered, recipe_saved, approved_and_delivered.</td></tr>
 <tr><td><code>inbound_messages</code></td><td>El messageId de cada mensaje que llegó de Scale, para no procesarlo dos veces.</td></tr>
 <tr><td><code>schema_migrations</code></td><td>Migraciones ya aplicadas.</td></tr>
 </tbody></table></div>
@@ -391,15 +472,19 @@ section("tools", "Tools del agente", """
 <div class="table-wrap"><table>
 <thead><tr><th>Tool</th><th>Qué hace</th><th>Aprobación</th></tr></thead>
 <tbody>
-<tr><td><code>start_proposal</code></td><td>Crea la propuesta con nombre, variantes del nombre, sitio y campus o red. Si viene de Scale, guarda el id del hilo.</td><td>No</td></tr>
+<tr><td><code>start_proposal</code></td><td>Crea la propuesta con nombre, variantes del nombre, sitio, campus o red y receta. Si viene de Scale, guarda el id del hilo.</td><td>No</td></tr>
 <tr><td><code>harvest_site_photos</code></td><td>Lee la home y /about con Firecrawl y devuelve las fotos de 600 px o más, de mayor a menor.</td><td>No</td></tr>
 <tr><td><code>set_slot_photo</code></td><td>Asigna una foto (del sitio o una que mande el equipo) a un espacio.</td><td>No</td></tr>
 <tr><td><code>generate_ai_photo</code></td><td>Genera la foto de un espacio con gpt-image-2. Tope de 6 por propuesta.</td><td>No</td></tr>
-<tr><td><code>render_proposal</code></td><td>Arma el PDF con las 3 fotos, bloquea si pesa más de 8 MB y guarda una versión nueva.</td><td>No</td></tr>
+<tr><td><code>render_proposal</code></td><td>Arma el PDF según el plan: valida el contenido, comprueba que cada hoja quepa, comprime las fotos, bloquea si pasa de 8 MB y guarda una versión nueva.</td><td>No</td></tr>
 <tr><td><code>deliver_proposal</code></td><td>Marca la propuesta como entregada con la versión aprobada.</td><td>Siempre</td></tr>
 <tr><td><code>list_proposals</code></td><td>Lista las propuestas recientes con su estado.</td><td>No</td></tr>
+<tr><td><code>list_modules</code></td><td>Catálogo de recetas y módulos, con qué contenido acepta cada uno y sus límites.</td><td>No</td></tr>
+<tr><td><code>update_plan</code></td><td>Cambia de receta, o inserta, mueve o quita módulos. Así se pone una hoja donde lo pida la instrucción.</td><td>No</td></tr>
+<tr><td><code>set_module_content</code></td><td>Guarda cifras o texto de un módulo (origen team o ai), lo valida y comprueba que la hoja quepa.</td><td>No</td></tr>
+<tr><td><code>save_recipe</code></td><td>Guarda el orden de páginas de una propuesta como receta reutilizable.</td><td>No</td></tr>
 </tbody></table></div>
-<p>Además hay dos skills en <code>agent/skills/</code>: <code>photo-selection</code> (cómo elegir fotos) y <code>school-name-variants</code> (posesivos y formas cortas del nombre).</p>
+<p>Además hay tres skills en <code>agent/skills/</code>: <code>photo-selection</code> (cómo elegir fotos), <code>school-name-variants</code> (posesivos y formas cortas del nombre) y <code>proposal-content</code> (qué pedir y cómo redactar el contenido de los módulos).</p>
 """)
 
 section("canales", "Canales", f"""
@@ -451,6 +536,11 @@ section("decisiones", "Decisiones y por qué", """
 <tr><td>Scale como interfaz, no una web propia</td><td>El equipo ya trabaja ahí.</td></tr>
 <tr><td>Hilos de conversación en vez de tarjetas Kanban</td><td>Se pide, se revisa y se corrige hablando, y varias personas pueden participar.</td></tr>
 <tr><td>Plantilla en módulos y recetas</td><td>Las variantes (red, campus único, hojas extra de un trato) se arman como listas de módulos, sin duplicar páginas.</td></tr>
+<tr><td>Las cifras son datos y los totales se calculan en código</td><td>Los precios de red son de cada trato y no hay tabla de descuentos. El modelo no multiplica ni inventa números.</td></tr>
+<tr><td>El modelo puede proponer texto, marcado como suyo</td><td>Casi siempre el equipo da el texto. Cuando no, el modelo propone dentro de límites, y la vista previa avisa qué texto es suyo para que se revise antes de aprobar.</td></tr>
+<tr><td>Páginas a la medida con bloques fijos</td><td>Flexibilidad sin diseño improvisado: la página se describe como datos y el renderer garantiza el estilo.</td></tr>
+<tr><td>Chequeo de 1 página por hoja con contenido</td><td>Un texto largo partiría la hoja en dos sin que nadie lo note.</td></tr>
+<tr><td>Imágenes fijas en JPEG y fotos comprimidas con sharp</td><td>Con los PNG originales, dos fotos de IA pasaban el tope de 8 MB, y el modelo terminaba repitiendo la misma foto para no pasarse.</td></tr>
 <tr><td>Assets fijos en Storage</td><td>El bundle de Vercel no incluye archivos referenciados por ruta.</td></tr>
 </tbody></table></div>
 """)
@@ -464,7 +554,7 @@ section("seguridad", "Seguridad y límites", """
 <tr><td>Webhooks</td><td>Telegram con secret token. Scale con bearer secret y comparación en tiempo constante.</td></tr>
 <tr><td>Base de datos</td><td>RLS activo sin policies: solo el rol <code>service_role</code> tiene acceso al schema <code>propel</code>.</td></tr>
 <tr><td>Archivos</td><td>Bucket privado. Los links firmados duran 1 hora (preview en Telegram), 24 horas (adjuntos a Scale) o 30 días (entrega final).</td></tr>
-<tr><td>Tamaño del PDF</td><td>Máximo 8 MB.</td></tr>
+<tr><td>Tamaño del PDF</td><td>Máximo 8 MB. Hoy pesa entre 2.4 y 3.1 MB.</td></tr>
 <tr><td>Imágenes con IA</td><td>Máximo 6 por propuesta.</td></tr>
 </tbody></table></div>
 """)
@@ -473,8 +563,8 @@ section("costos", "Costos y rendimiento", """
 <div class="grid">
 <div class="card"><h3>Medido</h3><ul>
 <li>Mensaje a preview: unos 40 segundos</li>
-<li>PDF de la prueba: 7 MB</li>
-<li>Fotos en la prueba: las 3 salieron del sitio, sin IA</li>
+<li>PDF base: 2.9 MB (antes 7.5 MB). Red con página a la medida: 2.4 MB</li>
+<li>Fotos en la prueba de Aspire: las 3 salieron del sitio, sin IA</li>
 </ul></div>
 <div class="card"><h3>Sin medir todavía</h3><ul>
 <li>Costo de modelo por propuesta</li>
@@ -490,18 +580,16 @@ section("pendientes", "Pendientes por prioridad", """
 <div class="table-wrap"><table>
 <thead><tr><th>#</th><th>Pendiente</th><th>Por qué importa</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Definir y aprobar las frases de campus único</td><td>Hoy solo cambian 2 frases. El resto del PDF dice red, y el cliente lo ve.</td></tr>
-<tr><td>2</td><td>Módulos de red a partir de las hojas de Noble Schools</td><td>Precios por red con cálculo en código (el precio por campus es de cada trato), servicios incluidos, reportes de distrito y términos.</td></tr>
-<tr><td>3</td><td>Guardar el plan por propuesta y que el agente lo ajuste</td><td>Para insertar una hoja donde la instrucción lo pida y para elegir otra receta.</td></tr>
-<tr><td>4</td><td>Comprimir y recortar las fotos al tamaño del espacio</td><td>El PDF pesa unos 7 MB y el tope es 8. Una foto pesada bloquea la entrega.</td></tr>
-<tr><td>5</td><td>Revisar un PDF completo contra la plantilla original, con otra escuela</td><td>Solo se probó con Aspire.</td></tr>
-<tr><td>6</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
-<tr><td>7</td><td>Probar nombres difíciles</td><td>Posesivos como St. Mary's, nombres terminados en s y nombres muy largos en la portada.</td></tr>
-<tr><td>8</td><td>Medir el costo por propuesta</td><td>Hoy no se puede saber cuánto cuesta cada una.</td></tr>
-<tr><td>9</td><td>Evals para elegir el modelo</td><td>Hay un fixture de PROUD Academy en <code>evals/fixtures</code>. Falta armar los casos.</td></tr>
-<tr><td>10</td><td>Subir a git los cambios del repo de Scale</td><td>Los canales y las dos funciones están desplegados pero sin commit.</td></tr>
-<tr><td>11</td><td>Agregar el grupo de Telegram del equipo</td><td>Basta con sumar su <code>chat.id</code> a la lista permitida.</td></tr>
-<tr><td>12</td><td>Decidir si la aprobación en Scale puede ser de un solo mensaje</td><td>Hoy son dos: "aprobado" y approve.</td></tr>
+<tr><td>1</td><td>Alinear los precios del contrato con las hojas de red</td><td>El contrato dice "Base Service Fee: $2,500/month per school". Si la hoja de red ofrece $1,500 por campus, el PDF se contradice. Es texto legal: hay que decidir cómo se parametriza.</td></tr>
+<tr><td>2</td><td>Definir y aprobar las frases de campus único</td><td>Hoy solo cambian 2 frases. El resto del PDF dice red, y el cliente lo ve.</td></tr>
+<tr><td>3</td><td>Detectar texto encima de las fotos del sitio</td><td>El filtro por nombre de archivo atrapa portadas de blog, pero no un gráfico con nombre normal.</td></tr>
+<tr><td>4</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
+<tr><td>5</td><td>Recetas desde Scale</td><td>La tabla <code>propel.recipes</code> ya existe. Falta la pantalla en Scale para armarlas sin el chat.</td></tr>
+<tr><td>6</td><td>Probar nombres difíciles</td><td>Posesivos como St. Mary's, nombres terminados en s y nombres muy largos en la portada.</td></tr>
+<tr><td>7</td><td>Medir el costo por propuesta</td><td>Hoy no se puede saber cuánto cuesta cada una.</td></tr>
+<tr><td>8</td><td>Evals para elegir el modelo</td><td>Hay un fixture de PROUD Academy en <code>evals/fixtures</code>. Ahora también conviene uno de red con página a la medida.</td></tr>
+<tr><td>9</td><td>Agregar el grupo de Telegram del equipo</td><td>Basta con sumar su <code>chat.id</code> a la lista permitida.</td></tr>
+<tr><td>10</td><td>Decidir si la aprobación en Scale puede ser de un solo mensaje</td><td>Hoy son dos: "aprobado" y approve.</td></tr>
 </tbody></table></div>
 """)
 
@@ -517,11 +605,14 @@ section("repo", "Repo y cómo correrlo", """
 ├─ react/                 la plantilla del PDF
 │  ├─ pages/              el diseño de cada página
 │  ├─ modules/            registro de módulos: datos, fotos y render
-│  ├─ recipes.ts          recetas (variantes) y planes
+│  ├─ recipes.ts          recetas (variantes), planes y validación del contenido
+│  ├─ blocks.tsx          bloques de las hojas de trato y páginas a la medida
+│  ├─ optimized/ (en template/full-service) imágenes fijas en JPEG
 │  ├─ buildProposal.tsx   arma el documento y lo renderiza
 │  └─ theme, fonts, icons, components, assets
-├─ db/migrations/         0001_init.sql, 0002_cowork.sql
-├─ scripts/               upload-assets.ts, migrate.ts, setup-supabase.sql
+├─ db/migrations/         0001_init.sql, 0002_cowork.sql, 0003_plans.sql
+├─ scripts/               upload-assets.ts, optimize-assets.ts, migrate.ts,
+│                         render_variants.tsx (muestras), e2e_variants.ts (integración)
 ├─ evals/fixtures/        casos de prueba (PROUD Academy)
 └─ docs/                  prompt de integración con Scale</code></pre>
 <h3>Comandos</h3>
@@ -529,6 +620,8 @@ section("repo", "Repo y cómo correrlo", """
 npm run dev                   # agente en local con eve
 npx tsx react/render.tsx      # genera template/full-service/react-preview.pdf
 npm run typecheck
+npx tsx scripts/render_variants.tsx /tmp/muestras   # PROUD, campus único, Noble y hojas sueltas
+npx tsx --env-file=.env.local scripts/e2e_variants.ts &lt;proposalId con 3 fotos&gt;
 npm run assets:upload         # sube los assets fijos a Storage
 npx eve deploy --non-interactive --yes</code></pre>
 <h3>Variables de entorno</h3>
@@ -558,12 +651,28 @@ section("glosario", "Glosario", """
 <tr><td>Outbox</td><td>Tabla de mensajes pendientes de enviar, con reintentos si falla la entrega.</td></tr>
 <tr><td>URL firmada</td><td>Link temporal a un archivo privado, con un token que caduca.</td></tr>
 <tr><td>RLS</td><td>Row Level Security de Postgres. Sin policies, nadie accede salvo el rol de servicio.</td></tr>
+<tr><td>Módulo</td><td>Una pieza de la propuesta: una página, o el contrato que ocupa varias.</td></tr>
+<tr><td>Receta</td><td>Lista ordenada de módulos que forma una variante de propuesta.</td></tr>
+<tr><td>Plan</td><td>La receta ajustada para una propuesta concreta.</td></tr>
+<tr><td>Página a la medida</td><td>Módulo <code>custom:&lt;slug&gt;</code> que se arma con bloques del sistema visual.</td></tr>
 <tr><td>Hilo</td><td>Conversación en Scale. Equivale a una sesión del agente.</td></tr>
 </tbody></table></div>
 """)
 
 
 # ───────────────────────── página ─────────────────────────
+
+
+def numbered(sections):
+    """Numera los diagramas en el orden en que aparecen (caption y aria-label)."""
+    out, n = [], 0
+    for sid, title, body in sections:
+        def fig(m):
+            nonlocal n
+            n += 1
+            return re.sub(r"Diagrama \d+\.", f"Diagrama {n}.", m.group(0))
+        out.append((sid, title, re.sub(r'<figure class="diagram">.*?</figure>', fig, body, flags=re.S)))
+    return out
 
 
 def build():
@@ -577,7 +686,7 @@ def build():
         date="03.10.26",
         brand="Propel",
         sub="PRD · TrustED Solutions",
-        sections=SECTIONS,
+        sections=numbered(SECTIONS),
     )
 
 

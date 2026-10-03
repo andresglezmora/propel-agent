@@ -6,6 +6,13 @@ export type ProposalStatus = "draft" | "harvesting" | "awaiting_approval" | "ren
 export type PhotoSlot = "cover" | "mission" | "centralized";
 export type PhotoSource = "site" | "ai" | "upload";
 
+/** Contenido de un módulo guardado en proposals.module_data, con su origen:
+ * "team" = lo dio el equipo tal cual; "ai" = lo propuso el modelo y hay que
+ * decirlo al mandar la vista previa. */
+export type ModuleEntry = { content: Record<string, unknown>; source: "team" | "ai"; updatedAt: string };
+
+export type SavedRecipe = { id: string; title: string; description: string; modules: string[] };
+
 export type Proposal = {
   id: string;
   school_name: string;
@@ -20,6 +27,9 @@ export type Proposal = {
   requested_by: string | null;
   telegram_chat_id: string | null;
   cowork_thread_id: string | null;
+  recipe: string;
+  plan: string[] | null;
+  module_data: Record<string, ModuleEntry>;
   error: string | null;
 };
 
@@ -31,6 +41,7 @@ export async function createProposal(input: {
   requestedBy?: string;
   telegramChatId?: string;
   coworkThreadId?: string;
+  recipe?: string;
 }): Promise<Proposal> {
   const variants = deriveNameVariants(input.schoolName, input.schoolShort);
   const { data, error } = await db()
@@ -44,6 +55,7 @@ export async function createProposal(input: {
       requested_by: input.requestedBy,
       telegram_chat_id: input.telegramChatId,
       cowork_thread_id: input.coworkThreadId,
+      recipe: input.recipe ?? "full-service",
       status: "draft",
     })
     .select()
@@ -232,4 +244,26 @@ export async function claimInboundMessage(messageId: string, threadId: string): 
   if (!error) return true;
   if (error.code === "23505") return false;
   throw new Error(`No se pudo registrar el mensaje ${messageId}: ${error.message}`);
+}
+
+// ---- recetas guardadas (propel.recipes) ----------------------------------
+
+export async function listSavedRecipes(): Promise<SavedRecipe[]> {
+  const { data, error } = await db().from("recipes").select("id, title, description, modules").order("id");
+  if (error) throw new Error(`No se pudieron leer las recetas guardadas: ${error.message}`);
+  return (data ?? []) as SavedRecipe[];
+}
+
+export async function saveRecipe(recipe: SavedRecipe & { createdBy?: string }): Promise<void> {
+  const { error } = await db()
+    .from("recipes")
+    .upsert({
+      id: recipe.id,
+      title: recipe.title,
+      description: recipe.description,
+      modules: recipe.modules,
+      created_by: recipe.createdBy,
+      updated_at: new Date().toISOString(),
+    });
+  if (error) throw new Error(`No se pudo guardar la receta ${recipe.id}: ${error.message}`);
 }

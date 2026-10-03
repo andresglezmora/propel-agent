@@ -27,7 +27,7 @@ async function main() {
   let bytes = 0;
   for (const rel of FIXED_ASSET_PATHS) {
     const data = await fs.readFile(path.join(projectRoot(), rel));
-    const contentType = rel.endsWith(".ttf") ? "font/ttf" : "image/png";
+    const contentType = rel.endsWith(".ttf") ? "font/ttf" : rel.endsWith(".jpg") ? "image/jpeg" : "image/png";
     const { error } = await supabase.storage
       .from(ASSETS_BUCKET)
       .upload(`${STORAGE_ASSET_PREFIX}${rel}`, data, { contentType, upsert: true });

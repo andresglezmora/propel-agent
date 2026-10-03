@@ -26,6 +26,9 @@ export type SiteImageCandidate = {
 };
 
 const DECORATIVE_HINTS = /logo|icon|favicon|sprite|avatar|badge|button|arrow|bullet|spinner|placeholder|social|facebook|twitter|instagram/i;
+// Gráficos con texto encima (portadas de blog, banners, flyers): pasan el
+// filtro de tamaño pero no sirven como foto de la propuesta.
+const GRAPHIC_HINTS = /blog[-_ ]?cover|banner|flyer|poster|infographic|graphic|header[-_ ]?image|social[-_ ]?card|og[-_ ]?image|thumbnail/i;
 
 let client: Firecrawl | null = null;
 function firecrawl(): Firecrawl {
@@ -82,7 +85,7 @@ export async function harvestSitePhotos(
 
   const pages = [base.toString(), new URL("/about", base).toString()];
   const perPage = await Promise.all(pages.map(imagesFromPage));
-  const all = [...new Set(perPage.flat())].filter((u) => /^https?:\/\//i.test(u) && !DECORATIVE_HINTS.test(u));
+  const all = [...new Set(perPage.flat())].filter((u) => /^https?:\/\//i.test(u) && !DECORATIVE_HINTS.test(u) && !GRAPHIC_HINTS.test(u));
 
   if (all.length === 0) {
     return {

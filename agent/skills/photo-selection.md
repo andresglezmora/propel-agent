@@ -18,6 +18,20 @@ esas.
 No se usa stock. Si el equipo insiste en una foto propia que no está en el sitio, pídesela
 directamente y úsala con `set_slot_photo`.
 
+## Fotos, no gráficos
+
+Usa fotos reales, no piezas gráficas: nada con texto encima, logos, marcos ni
+fondos diseñados (portadas de blog, banners, flyers). `harvest_site_photos` ya
+descarta las que lo dicen en el nombre del archivo, pero si una candidata tiene
+nombre de gráfico o de evento promocional, descártala tú también.
+
+## Una foto, un espacio
+
+Nunca uses la misma foto en dos espacios: en el PDF se ve como un error.
+`set_slot_photo` lo rechaza. Si el sitio solo tiene una foto buena, úsala en la
+portada y genera las demás con IA. El peso del PDF no es motivo para repetir
+fotos: `render_proposal` ya las comprime.
+
 ## La portada (`cover`) es la foto más importante
 
 Es la más visible de todo el documento. Al elegir entre varias candidatas del sitio:

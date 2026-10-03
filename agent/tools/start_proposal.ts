@@ -1,10 +1,11 @@
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 import { createProposal, logEvent } from "#lib/db";
+import { allRecipes } from "#lib/plan";
 
 export default defineTool({
   description:
-    "Primer paso de una propuesta nueva: crea el registro con el nombre de la escuela (y sus variantes: posesivo, corto), el sitio, y si es un solo campus o una red. Llama a esto en cuanto tengas esos 3 datos; si dudas de cómo se escribe el posesivo de un nombre raro, pregunta antes de seguir en vez de adivinar.",
+    "Primer paso de una propuesta nueva: crea el registro con el nombre de la escuela (y sus variantes: posesivo, corto), el sitio, y si es un solo campus o una red, y con qué receta (variante) se arma. Llama a esto en cuanto tengas esos 3 datos; si dudas de cómo se escribe el posesivo de un nombre raro, pregunta antes de seguir en vez de adivinar.",
   inputSchema: z.object({
     schoolName: z.string().min(2).describe('Nombre tal cual debe aparecer, ej. "PROUD Academy".'),
     schoolShort: z
@@ -17,6 +18,10 @@ export default defineTool({
       .describe("'single' si es un solo plantel, 'network' si son varios campus/distrito."),
     requestedBy: z.string().optional().describe("Quién la pidió (nombre o usuario de Telegram)."),
     telegramChatId: z.string().optional(),
+    recipe: z
+      .string()
+      .optional()
+      .describe('Variante de propuesta. Default "full-service". Usa "full-service-network" si piden las hojas de red (precios por número de campus). list_modules muestra todas.'),
     coworkThreadId: z
       .string()
       .optional()
@@ -27,6 +32,10 @@ export default defineTool({
     // Preferimos el threadId que Scale estampó en la sesión; el del input es respaldo.
     const fromSession = ctx.session.auth.initiator?.attributes?.threadId;
     const coworkThreadId = typeof fromSession === "string" ? fromSession : input.coworkThreadId;
+    const recipes = await allRecipes();
+    if (input.recipe && !recipes[input.recipe]) {
+      return { error: `No existe la receta "${input.recipe}". Opciones: ${Object.keys(recipes).join(", ")}.` };
+    }
     const websiteUrl = /^https?:\/\//i.test(input.websiteUrl) ? input.websiteUrl : `https://${input.websiteUrl}`;
     const proposal = await createProposal({ ...input, websiteUrl, coworkThreadId });
     await logEvent(proposal.id, "created", { schoolName: input.schoolName, websiteUrl });
@@ -37,6 +46,7 @@ export default defineTool({
       schoolShort: proposal.school_short,
       websiteUrl: proposal.website_url,
       campusMode: proposal.campus_mode,
+      recipe: proposal.recipe,
       status: proposal.status,
     };
   },

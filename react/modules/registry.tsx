@@ -16,6 +16,8 @@ import { TestimonialsPage } from "../pages/TestimonialsPage";
 import { AgreementCoverPage } from "../pages/AgreementCoverPage";
 import { AgreementPage } from "../pages/AgreementPage";
 import type { ProposalModule } from "./types";
+import { networkPricing, networkIncludes } from "./network";
+import { customModule, isCustomId } from "./custom";
 
 // Los assets FIJOS de TrustED (logos, capturas de producto, fotos de TrustED,
 // logos de los testimonios) nunca cambian de escuela a escuela. Solo las fotos
@@ -26,20 +28,20 @@ const FIXED = {
   logoWhite: () => asset("brand/trusted-logo-white.png"),
   robustCrmShots: () =>
     [
-      asset("template/full-service/uploads/img10.png"),
-      asset("template/full-service/uploads/img9.png"),
-      asset("template/full-service/uploads/img8.png"),
+      asset("template/full-service/optimized/img10.jpg"),
+      asset("template/full-service/optimized/img9.jpg"),
+      asset("template/full-service/optimized/img8.jpg"),
     ] as [string, string, string],
-  leadGenPhoto: () => asset("template/full-service/uploads/img16.png"),
-  parentOutreachPhoto: () => asset("template/full-service/uploads/img17.png"),
+  leadGenPhoto: () => asset("template/full-service/optimized/img16.jpg"),
+  parentOutreachPhoto: () => asset("template/full-service/optimized/img17.jpg"),
   dataDashboardsShots: () =>
     [
-      asset("template/full-service/uploads/img11.png"),
-      asset("template/full-service/uploads/img12.png"),
-      asset("template/full-service/uploads/img13.png"),
+      asset("template/full-service/optimized/img11.jpg"),
+      asset("template/full-service/optimized/img12.jpg"),
+      asset("template/full-service/optimized/img13.jpg"),
     ] as [string, string, string],
-  marketingDesignPhoto: () => asset("template/full-service/uploads/img14.png"),
-  cmoStrategyPhoto: () => asset("template/full-service/uploads/img15.png"),
+  marketingDesignPhoto: () => asset("template/full-service/optimized/img14.jpg"),
+  cmoStrategyPhoto: () => asset("template/full-service/optimized/img15.jpg"),
   testimonialLogos: () => ({
     phalen: asset("template/full-service/assets/img_286.png"),
     aspire: asset("template/full-service/assets/img_1544.png"),
@@ -155,18 +157,28 @@ const list: ProposalModule[] = [
   },
   {
     id: "agreement-cover",
-    title: "Portada del acuerdo",
-    description: "Separador antes del texto legal.",
+    title: "Portada del contrato",
+    description: "Primera página del contrato (Part Two: Service Agreement). \"Antes del contrato\" significa antes de este módulo.",
     pages: 1,
     render: () => <AgreementCoverPage logoWhite={FIXED.logoWhite()} />,
   },
   {
     id: "agreement",
-    title: "Acuerdo",
-    description: "Texto legal del servicio. Fluye en varias páginas.",
+    title: "Contrato",
+    description: "Texto legal del contrato, después de su portada. Fluye en varias páginas. Nada se inserta entre agreement-cover y agreement.",
     pages: null,
     render: (ctx) => <AgreementPage schoolName={ctx.schoolName} possessive={ctx.schoolPossessive} />,
   },
+  networkPricing,
+  networkIncludes,
 ];
 
 export const MODULES: Record<string, ProposalModule> = Object.fromEntries(list.map((m) => [m.id, m]));
+
+/** Módulo por id. Los "custom:<slug>" no están en el registro: se crean al
+ * pedirlos (puede haber varios por propuesta). */
+export function getModule(id: string): ProposalModule | undefined {
+  if (MODULES[id]) return MODULES[id];
+  if (isCustomId(id)) return customModule(id);
+  return undefined;
+}

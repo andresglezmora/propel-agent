@@ -38,6 +38,12 @@ export default defineAgent({
       "unicode-trie",
       "png-js",
       "hyphen",
+      // sharp es un addon nativo (libvips): comprime las fotos antes de meterlas
+      // al PDF. Carga su binario de plataforma (@img/sharp-*) por ruta, así que
+      // va completo, igual que pdfkit.
+      "sharp*",
+      "@img/sharp-linux-x64",
+      "@img/sharp-libvips-linux-x64",
     ],
   },
 });

@@ -2,26 +2,57 @@ import { registerFonts } from "./fonts";
 import { assetPath, ensureAssets } from "./assets";
 import React from "react";
 import { Document, renderToBuffer } from "@react-pdf/renderer";
-import { MODULES } from "./modules/registry";
-import { planFromRecipe, validatePlan, type ProposalPlan } from "./recipes";
+import { planFromRecipe, resolvePlan, type ProposalPlan, type ResolvedModule } from "./recipes";
 import type { ProposalContext } from "./modules/types";
 
-// El documento ya no es una lista fija de páginas: es un PLAN (receta +
-// ajustes) que se recorre módulo por módulo. Sin plan explícito se usa la
-// receta "full-service", que reproduce exactamente las 19 páginas de siempre.
+// El documento no es una lista fija de páginas: es un PLAN (receta + ajustes)
+// que se recorre módulo por módulo. Sin plan explícito se usa la receta
+// "full-service", que reproduce exactamente las 19 páginas de siempre.
 
 export type ProposalInput = ProposalContext;
 
-export function buildProposalDocument(input: ProposalInput, plan: ProposalPlan = planFromRecipe()) {
-  const errors = validatePlan(plan);
-  if (errors.length > 0) throw new Error(`Plan inválido: ${errors.join(" ")}`);
+function documentFor(input: ProposalInput, modules: ResolvedModule[]) {
   return (
     <Document>
-      {plan.modules.map((id) => (
-        <React.Fragment key={id}>{MODULES[id]!.render(input)}</React.Fragment>
+      {modules.map(({ module, content }) => (
+        <React.Fragment key={module.id}>{module.render(input, content)}</React.Fragment>
       ))}
     </Document>
   );
+}
+
+function resolveOrThrow(input: ProposalInput, plan: ProposalPlan): ResolvedModule[] {
+  const resolved = resolvePlan(plan, input);
+  if (!resolved.ok) throw new Error(`No se puede armar la propuesta: ${resolved.errors.join(" | ")}`);
+  return resolved.modules;
+}
+
+export function buildProposalDocument(input: ProposalInput, plan: ProposalPlan = planFromRecipe()) {
+  return documentFor(input, resolveOrThrow(input, plan));
+}
+
+/** Cuenta las páginas de un PDF ya generado. */
+export function countPdfPages(pdf: Buffer): number {
+  return (pdf.toString("latin1").match(/\/Type\s*\/Page[^s]/g) ?? []).length;
+}
+
+/** Los módulos con contenido (datos o texto que cambia) se renderizan solos
+ * para comprobar que ocupan las páginas que declaran: un texto más largo de
+ * la cuenta haría que la hoja se parta en dos. */
+export async function checkModulePages(input: ProposalInput, plan: ProposalPlan): Promise<string[]> {
+  await ensureAssets();
+  registerFonts();
+  const problems: string[] = [];
+  for (const rm of resolveOrThrow(input, plan)) {
+    if (!rm.module.content || rm.module.pages === null) continue;
+    const pages = countPdfPages(await renderToBuffer(documentFor(input, [rm])));
+    if (pages !== rm.module.pages) {
+      problems.push(
+        `"${rm.module.id}" ocupa ${pages} páginas y debe ocupar ${rm.module.pages}: acorta el texto o quita un bloque.`,
+      );
+    }
+  }
+  return problems;
 }
 
 export async function renderProposalPdf(input: ProposalInput, plan?: ProposalPlan): Promise<Buffer> {
