@@ -232,9 +232,36 @@ footer.doc { border-top:1px solid var(--rule); padding-top:20px; margin-top:24px
 <tr><td>Foto de misión</td><td>Página 2</td><td>Igual.</td></tr>
 <tr><td>Foto de Centralized Enrollment</td><td>Página 4</td><td>Igual.</td></tr>
 <tr><td>Hojas de trato y páginas a la medida</td><td>Donde las ponga el plan</td><td>Cifras del equipo; texto del equipo, por defecto o propuesto por el modelo (sección 6).</td></tr>
-<tr><td>Campus único</td><td>Portada y página 3</td><td>Se quita "Network-wide" de la portada y " across all campuses" de la página 3.</td></tr>
+<tr><td>Campus único</td><td>Páginas 1, 2, 3, 4, 6, 9, 10 y 11, y el gasto en anuncios del contrato</td><td>Las frases de red se cambian por su versión de campus único (tabla de abajo).</td></tr>
 </tbody></table></div>
-<div class="callout"><span class="label">Pendiente</span><p>Hoy solo se adaptan esas dos frases para un campus único. El resto del PDF habla de red. La lista completa de frases por cambiar falta definirla y aprobarla (sección 17).</p></div>
+<h3>Frases de campus único</h3>
+<p>Todas las frases que cambian entre red y campus único viven en <code>react/campusCopy.ts</code>. Esta tabla se genera de ese archivo. Las variantes de campus único tienen un largo parecido al original y no afirman nada que el original no diga. No cambian a propósito los testimonios (son citas de clientes reales) ni las cláusulas del contrato que ya están en condicional ("For organizations operating multiple campuses…").</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Clave</th><th>Red</th><th>Campus único</th></tr></thead>
+<tbody>
+<tr><td><code>mission.clarity</code></td><td>Real-time, district-wide visibility into enrollment, retention, and marketing performance.</td><td>Real-time, school-wide visibility into enrollment, retention, and marketing performance.</td></tr>
+<tr><td><code>mission.confidenceEnd</code></td><td>allocate resources effectively, and support schools proactively.</td><td>allocate resources effectively, and support families and staff proactively.</td></tr>
+<tr><td><code>partner.processes</code></td><td>That eliminate cracks in the system: automated workflows, retention campaigns, and cross-campus reporting that ensure no inquiry or student is overlooked.</td><td>That eliminate cracks in the system: automated workflows, retention campaigns, and school-wide reporting that ensure no inquiry or student is overlooked.</td></tr>
+<tr><td><code>partner.dashboards</code></td><td>For benchmarking, network-wide and per school.</td><td>For benchmarking enrollment and campaign performance over time.</td></tr>
+<tr><td><code>partner.scalability</code></td><td>To expand as the school network continues to grow.</td><td>To grow with the school as enrollment expands.</td></tr>
+<tr><td><code>partner.unifies</code></td><td>that unifies the district's enrollment, marketing, and support services into one</td><td>that unifies the school's enrollment, marketing, and support services into one</td></tr>
+<tr><td><code>partner.classroomsEnd</code></td><td> across all campuses</td><td><em>(se quita)</em></td></tr>
+<tr><td><code>centralized.interventionEnd</code></td><td>when a campus needs intervention.</td><td>when enrollment needs intervention.</td></tr>
+<tr><td><code>centralized.leaders</code></td><td>So every leader — from school principals to district executives — sees exactly where progress is being made and where additional support is required.</td><td>So every leader — from the principal to the board — sees exactly where progress is being made and where additional support is required.</td></tr>
+<tr><td><code>leadgen.landing</code></td><td>Custom-built pages for each school or campaign that turn clicks into form submissions, designed to capture the right families at the right moment.</td><td>Custom-built pages for each program or campaign that turn clicks into form submissions, designed to capture the right families at the right moment.</td></tr>
+<tr><td><code>dashboards.audienceEnd</code></td><td>built for both network leadership and individual school administrators.</td><td>built for both school leadership and your enrollment team.</td></tr>
+<tr><td><code>dashboards.funnelEnd</code></td><td>enrolled — across every school in the network.</td><td>enrolled — updated in real time.</td></tr>
+<tr><td><code>dashboards.compareTitle</code></td><td>School-by-School Comparison</td><td>Campaign-by-Campaign Comparison</td></tr>
+<tr><td><code>dashboards.compareStart</code></td><td>Quickly identify which schools are hitting targets and which need additional support</td><td>Quickly identify which campaigns are hitting targets and which need additional support</td></tr>
+<tr><td><code>marketing.assets</code></td><td>asset your schools need — ensuring your brand is consistent, professional, and compelling</td><td>asset your school needs — ensuring your brand is consistent, professional, and compelling</td></tr>
+<tr><td><code>cmo.marketAnalysis</code></td><td>We study the neighborhoods, competitors, and demographic trends around each school to build campaigns that speak directly to the families most likely to enroll.</td><td>We study the neighborhoods, competitors, and demographic trends around the school to build campaigns that speak directly to the families most likely to enroll.</td></tr>
+<tr><td><code>cmo.hireEnd</code></td><td>thinking most school networks can't afford to hire full-time.</td><td>thinking most schools can't afford to hire full-time.</td></tr>
+<tr><td><code>contract.adSpend</code></td><td>recommended $500–$1,000/month district-wide, adjustable by season</td><td>recommended $500–$1,000/month, adjustable by season</td></tr>
+<tr><td><code>contract.adSpendExhibit</code></td><td>Recommended $500–$1,000/month district-wide (seasonally adjusted). Paid directly by the school to platforms.</td><td>Recommended $500–$1,000/month (seasonally adjusted). Paid directly by the school to platforms.</td></tr>
+<tr><td><code>dashboards pills</code></td><td>Network · District-Level View · School · Per-School Breakdown · Real-Time · Live Data Sync</td><td>School · School-Wide View · Funnel · Stage Breakdown · Real-Time · Live Data Sync</td></tr>
+<tr><td><code>cmo.opening</code></td><td>Every {escuela} campus gets a dedicated enrollment strategy</td><td>{escuela} gets a dedicated enrollment strategy</td></tr>
+<tr><td><code>cover</code></td><td>Línea "Network-wide" en la portada</td><td><em>(se quita)</em></td></tr>
+</tbody></table></div>
 </section>
 <section id="alcance"><h2><span class="n">04</span>Alcance</h2>
 <div class="grid">
@@ -1246,7 +1273,7 @@ Authorization: Bearer &lt;PROPEL_STATUS_WEBHOOK_SECRET&gt;
 <thead><tr><th>#</th><th>Pendiente</th><th>Por qué importa</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Aprobar la redacción del contrato para tratos de red</td><td>Ya está construida (sección 6), pero es texto legal: alguien debe aprobar las 4 frases antes de usarla con un cliente.</td></tr>
-<tr><td>2</td><td>Definir y aprobar las frases de campus único</td><td>Hoy solo cambian 2 frases. El resto del PDF dice red, y el cliente lo ve.</td></tr>
+<tr><td>2</td><td>Aprobar las frases de campus único</td><td>Ya están construidas (sección 3). Falta que el equipo las apruebe antes de desplegarlas.</td></tr>
 <tr><td>3</td><td>Detectar texto encima de las fotos del sitio</td><td>El filtro por nombre de archivo atrapa portadas de blog, pero no un gráfico con nombre normal.</td></tr>
 <tr><td>4</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
 <tr><td>5</td><td>Recetas desde Scale</td><td>La tabla <code>propel.recipes</code> ya existe. Falta la pantalla en Scale para armarlas sin el chat.</td></tr>

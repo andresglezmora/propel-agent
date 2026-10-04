@@ -8,6 +8,8 @@
 // type "kv": término en negrita seguido de su texto (ej. "Initial Term:").
 // type "bullets": lista con viñetas.
 
+import { campusCopy, type CampusMode } from "./campusCopy";
+
 export type Block =
   | { type: "p"; text: string }
   | { type: "kv"; label: string; text: string }
@@ -19,7 +21,12 @@ export type Section = { number: string; heading: string; blocks: Block[] };
  * él, el contrato usa la tarifa estándar de $2,500 por escuela. */
 export type NetworkFee = { pricePerCampus: string; campuses: number; total: string };
 
-export function buildAgreementSections(schoolName: string, possessive: string, fee?: NetworkFee): Section[] {
+export function buildAgreementSections(
+  schoolName: string,
+  possessive: string,
+  fee?: NetworkFee,
+  campusMode: CampusMode = "network",
+): Section[] {
   return [
     {
       number: "1",
@@ -97,7 +104,7 @@ export function buildAgreementSections(schoolName: string, possessive: string, f
         {
           type: "kv",
           label: "Ad Spend:",
-          text: `Paid directly by ${schoolName} (recommended $500–$1,000/month district-wide, adjustable by season).`,
+          text: `Paid directly by ${schoolName} (${campusCopy(campusMode, "contract.adSpend")}).`,
         },
         { type: "kv", label: "Print / Production / 3rd-Party Tools:", text: "At cost with prior approval." },
         {
@@ -245,12 +252,14 @@ export const exhibitA = (fee?: NetworkFee) => ({
     : EXHIBIT_A.sub,
 });
 
-export const exhibitC = (fee?: NetworkFee) => ({
+export const exhibitC = (fee?: NetworkFee, campusMode: CampusMode = "network") => ({
   ...EXHIBIT_C,
   items: EXHIBIT_C.items.map((it) =>
     fee && it.label === "Base Fee:"
       ? { ...it, text: `${fee.total}/month (in advance): ${fee.campuses} participating campuses at ${fee.pricePerCampus}/month per campus.` }
-      : it,
+      : it.label === "Ad Spend:"
+        ? { ...it, text: campusCopy(campusMode, "contract.adSpendExhibit") }
+        : it,
   ),
 });
 

@@ -2,11 +2,13 @@ import React from "react";
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { color, space, font, PAGE } from "../theme";
 import type { ImgSrc } from "../imgSrc";
+import { campusCopy, type CampusMode } from "../campusCopy";
 import { NumberBadge, Callout, IconRing } from "../components";
 
 export type MissionPageProps = {
   schoolName: string;
   photo: ImgSrc;
+  campusMode?: CampusMode;
 };
 
 const s = StyleSheet.create({
@@ -37,7 +39,7 @@ const s = StyleSheet.create({
   closing: { fontSize: 9.3, lineHeight: 1.4, color: "#3a3a4a", marginTop: 4 },
 });
 
-export function MissionPage({ schoolName, photo }: MissionPageProps) {
+export function MissionPage({ schoolName, photo, campusMode = "network" }: MissionPageProps) {
   return (
     <Page size="LETTER" style={s.page}>
       <Text style={s.h1}>
@@ -92,8 +94,7 @@ export function MissionPage({ schoolName, photo }: MissionPageProps) {
             <View style={{ flex: 1 }}>
               <Text style={s.itemTitle}>CLARITY</Text>
               <Text style={s.itemBody}>
-                Real-time, district-wide visibility into enrollment, retention, and marketing
-                performance.
+                {campusCopy(campusMode, "mission.clarity")}
               </Text>
             </View>
           </View>
@@ -114,8 +115,8 @@ export function MissionPage({ schoolName, photo }: MissionPageProps) {
             <View style={{ flex: 1 }}>
               <Text style={s.itemTitle}>CONFIDENCE</Text>
               <Text style={s.itemBody}>
-                Data-backed insights that allow {schoolName} leadership to anticipate challenges,
-                allocate resources effectively, and support schools proactively.
+                Data-backed insights that allow {schoolName}
+                {` leadership to anticipate challenges, ${campusCopy(campusMode, "mission.confidenceEnd")}`}
               </Text>
             </View>
           </View>

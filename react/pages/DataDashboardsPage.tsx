@@ -2,6 +2,7 @@ import React from "react";
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { color, space, font } from "../theme";
 import { PillarHeader, Pill, IconRing } from "../components";
+import { campusCopy, dashboardPills, type CampusMode } from "../campusCopy";
 
 const s = StyleSheet.create({
   page: { fontFamily: font.display, color: color.ink, paddingHorizontal: space.s6, paddingVertical: 36 },
@@ -27,17 +28,17 @@ const s = StyleSheet.create({
 export function DataDashboardsPage({
   schoolName,
   photos,
+  campusMode = "network",
 }: {
   schoolName: string;
+  campusMode?: CampusMode;
   photos: [string, string, string]; // [districtOverview, retentionSummary, enrollmentTracker]
 }) {
   return (
     <Page size="LETTER" style={s.page}>
       <PillarHeader n="04." title="DATA DASHBOARDS" sub="All Your Data. One Clear Picture." />
       <Text style={s.body}>
-        We aggregate data from your PowerSchool SIS and all marketing platforms into clean,
-        easy-to-read dashboards — built for both network leadership and individual school
-        administrators.
+        {`We aggregate data from your PowerSchool SIS and all marketing platforms into clean, easy-to-read dashboards — ${campusCopy(campusMode, "dashboards.audienceEnd")}`}
       </Text>
 
       <View style={s.shotsRow}>
@@ -49,12 +50,9 @@ export function DataDashboardsPage({
       </View>
 
       <View style={s.pillGrid}>
-        <Pill>Network</Pill>
-        <Pill>District-Level View</Pill>
-        <Pill>School</Pill>
-        <Pill>Per-School Breakdown</Pill>
-        <Pill>Real-Time</Pill>
-        <Pill>Live Data Sync</Pill>
+        {dashboardPills(campusMode).map((p) => (
+          <Pill key={p}>{p}</Pill>
+        ))}
       </View>
 
       <View style={s.row}>
@@ -62,16 +60,16 @@ export function DataDashboardsPage({
           <IconRing icon="funnel" size={30} />
           <Text style={s.cardTitle}>Enrollment Funnel Tracking</Text>
           <Text style={s.cardBody}>
-            See exactly how many leads are at each stage — inquiry, application, accepted,
-            enrolled — across every school in the network.
+            {`See exactly how many leads are at each stage — inquiry, application, accepted, ${campusCopy(campusMode, "dashboards.funnelEnd")}`}
           </Text>
         </View>
         <View style={s.card}>
           <IconRing icon="chart-bar" size={30} />
-          <Text style={s.cardTitle}>School-by-School Comparison</Text>
+          <Text style={s.cardTitle}>{campusCopy(campusMode, "dashboards.compareTitle")}</Text>
           <Text style={s.cardBody}>
-            Quickly identify which schools are hitting targets and which need additional support
-            or campaign adjustments, so {schoolName} leadership can act early.
+            {`${campusCopy(campusMode, "dashboards.compareStart")} or campaign adjustments, so `}
+            {schoolName}
+            {" leadership can act early."}
           </Text>
         </View>
       </View>

@@ -2,6 +2,7 @@ import React from "react";
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { color, space, font } from "../theme";
 import { PillarHeader, Pill } from "../components";
+import { campusCopy, type CampusMode } from "../campusCopy";
 
 const s = StyleSheet.create({
   page: { fontFamily: font.display, color: color.ink, paddingHorizontal: space.s6, paddingVertical: 40 },
@@ -20,14 +21,12 @@ const ASSETS = [
   "Email Templates", "Billboards", "Social Media Graphics", "Yard Signs", "Event Materials",
 ] as const;
 
-export function MarketingDesignPage({ schoolName, photo }: { schoolName: string; photo: string }) {
+export function MarketingDesignPage({ schoolName, photo, campusMode = "network" }: { schoolName: string; photo: string; campusMode?: CampusMode }) {
   return (
     <Page size="LETTER" style={s.page}>
       <PillarHeader n="05." title="FULL MARKETING DESIGN" sub="Every Asset. Every Channel. One Cohesive Brand." />
       <Text style={s.body}>
-        From posters and yard signs to full websites and billboards, we create every marketing
-        asset your schools need — ensuring your brand is consistent, professional, and compelling
-        from online to in-person.
+        {`From posters and yard signs to full websites and billboards, we create every marketing ${campusCopy(campusMode, "marketing.assets")} from online to in-person.`}
       </Text>
       <Image src={photo} style={s.collage} />
 

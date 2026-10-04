@@ -2,6 +2,7 @@ import React from "react";
 import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { color, space, font } from "../theme";
 import { PillarHeader, IconRing } from "../components";
+import { campusCopy, copyOrText, type CampusMode } from "../campusCopy";
 
 const s = StyleSheet.create({
   page: { fontFamily: font.display, color: color.ink, paddingHorizontal: space.s6, paddingVertical: 40 },
@@ -20,12 +21,12 @@ const s = StyleSheet.create({
 
 const FEATURES = [
   { icon: "target", accent: "Targeted", rest: " ad campaigns", body: "Meta, Google, TikTok and programmatic campaigns built specifically for student recruitment, targeting families by location, school interest, and enrollment stage." },
-  { icon: "browser", accent: "High-converting", rest: " landing pages", body: "Custom-built pages for each school or campaign that turn clicks into form submissions, designed to capture the right families at the right moment." },
+  { icon: "browser", accent: "High-converting", rest: " landing pages", body: "leadgen.landing" },
   { icon: "funnel", accent: "Full funnel", rest: " visibility", body: "Every lead is tracked from first click to enrollment. You always know where families came from, how they moved through the funnel, and what converted them." },
   { icon: "trend-up", accent: "Continuous", rest: " optimization", body: "We monitor performance daily and make real-time adjustments to maximize lead volume and quality, reducing cost-per-lead over time." },
 ] as const;
 
-export function LeadGenPage({ photo }: { photo: string }) {
+export function LeadGenPage({ photo, campusMode = "network" }: { photo: string; campusMode?: CampusMode }) {
   return (
     <Page size="LETTER" style={s.page}>
       <PillarHeader n="01." title="LEAD GENERATION" sub="High-Performing Campaigns, Fully Managed for You" />
@@ -45,7 +46,7 @@ export function LeadGenPage({ photo }: { photo: string }) {
               <Text style={s.cardAccent}>{f.accent}</Text>
               {f.rest}
             </Text>
-            <Text style={s.cardBody}>{f.body}</Text>
+            <Text style={s.cardBody}>{copyOrText(campusMode, f.body)}</Text>
           </View>
         ))}
       </View>

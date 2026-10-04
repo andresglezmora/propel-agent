@@ -72,7 +72,7 @@ const list: ProposalModule[] = [
     description: "Por qué TrustED y para quién, con foto de la escuela.",
     pages: 1,
     photoSlots: [{ slot: "mission", minLongSide: 800, description: "Alumnos con docentes, si el sitio lo tiene." }],
-    render: (ctx) => <MissionPage schoolName={ctx.schoolName} photo={ctx.photos.mission} />,
+    render: (ctx) => <MissionPage schoolName={ctx.schoolName} photo={ctx.photos.mission} campusMode={ctx.campusMode} />,
   },
   {
     id: "partner",
@@ -87,7 +87,7 @@ const list: ProposalModule[] = [
     description: "Cómo se centraliza la inscripción, con foto de la comunidad escolar.",
     pages: 1,
     photoSlots: [{ slot: "centralized", minLongSide: 800, description: "Cualquier foto de la comunidad escolar." }],
-    render: (ctx) => <CentralizedPage schoolName={ctx.schoolName} photo={ctx.photos.centralized} />,
+    render: (ctx) => <CentralizedPage schoolName={ctx.schoolName} photo={ctx.photos.centralized} campusMode={ctx.campusMode} />,
   },
   {
     id: "pricing",
@@ -101,7 +101,7 @@ const list: ProposalModule[] = [
     title: "Lead Generation",
     description: "Pilar 1: generación de prospectos.",
     pages: 1,
-    render: () => <LeadGenPage photo={FIXED.leadGenPhoto()} />,
+    render: (ctx) => <LeadGenPage photo={FIXED.leadGenPhoto()} campusMode={ctx.campusMode} />,
   },
   {
     id: "robust-crm",
@@ -122,21 +122,21 @@ const list: ProposalModule[] = [
     title: "Data Dashboards",
     description: "Pilar 4: dashboards y datos.",
     pages: 1,
-    render: (ctx) => <DataDashboardsPage schoolName={ctx.schoolName} photos={FIXED.dataDashboardsShots()} />,
+    render: (ctx) => <DataDashboardsPage schoolName={ctx.schoolName} photos={FIXED.dataDashboardsShots()} campusMode={ctx.campusMode} />,
   },
   {
     id: "marketing-design",
     title: "Full Marketing Design",
     description: "Pilar 5: diseño de materiales de marketing.",
     pages: 1,
-    render: (ctx) => <MarketingDesignPage schoolName={ctx.schoolName} photo={FIXED.marketingDesignPhoto()} />,
+    render: (ctx) => <MarketingDesignPage schoolName={ctx.schoolName} photo={FIXED.marketingDesignPhoto()} campusMode={ctx.campusMode} />,
   },
   {
     id: "cmo-strategy",
     title: "CMO-Level Strategy",
     description: "Pilar 6: estrategia de marketing a nivel CMO.",
     pages: 1,
-    render: (ctx) => <CmoStrategyPage schoolName={ctx.schoolName} photo={FIXED.cmoStrategyPhoto()} />,
+    render: (ctx) => <CmoStrategyPage schoolName={ctx.schoolName} photo={FIXED.cmoStrategyPhoto()} campusMode={ctx.campusMode} />,
   },
   {
     id: "cost-comparison",
@@ -170,7 +170,12 @@ const list: ProposalModule[] = [
     pages: null,
     check: (ctx, planModules) => (planModules.includes("network-pricing") ? (networkFeeFrom(ctx).error ?? null) : null),
     render: (ctx) => (
-      <AgreementPage schoolName={ctx.schoolName} possessive={ctx.schoolPossessive} fee={networkFeeFrom(ctx).fee} />
+      <AgreementPage
+        schoolName={ctx.schoolName}
+        possessive={ctx.schoolPossessive}
+        fee={networkFeeFrom(ctx).fee}
+        campusMode={ctx.campusMode}
+      />
     ),
   },
   networkPricing,

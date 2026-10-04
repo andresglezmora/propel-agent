@@ -3,6 +3,7 @@ import { Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
 import { color, space, font } from "../theme";
 import type { ImgSrc } from "../imgSrc";
 import { IconRing } from "../components";
+import { campusCopy, copyOrText, type CampusMode } from "../campusCopy";
 
 const s = StyleSheet.create({
   page: {
@@ -50,7 +51,7 @@ const ROWS = [
     icon: "chart-line-up",
     lead: "INCREASE ACCOUNTABILITY",
     rest: " AND TRANSPARENCY",
-    body: "So every leader — from school principals to district executives — sees exactly where progress is being made and where additional support is required.",
+    body: "centralized.leaders",
   },
   {
     icon: "users-three",
@@ -66,7 +67,7 @@ const ROWS = [
   },
 ] as const;
 
-export function CentralizedPage({ schoolName, photo }: { schoolName: string; photo: ImgSrc }) {
+export function CentralizedPage({ schoolName, photo, campusMode = "network" }: { schoolName: string; photo: ImgSrc; campusMode?: CampusMode }) {
   return (
     <Page size="LETTER" style={s.page}>
       <View style={s.headRow}>
@@ -76,9 +77,7 @@ export function CentralizedPage({ schoolName, photo }: { schoolName: string; pho
             <Text style={s.h1Bold}>& Operations System</Text>
           </Text>
           <Text style={s.body}>
-            The challenge today is that enrollment, marketing, data, and operations often sit in
-            silos, making it difficult for leadership to see the whole picture or to act quickly
-            when a campus needs intervention.
+            {`The challenge today is that enrollment, marketing, data, and operations often sit in silos, making it difficult for leadership to see the whole picture or to act quickly ${campusCopy(campusMode, "centralized.interventionEnd")}`}
           </Text>
           <Text style={s.body}>
             This proposal establishes a{" "}
@@ -98,7 +97,7 @@ export function CentralizedPage({ schoolName, photo }: { schoolName: string; pho
               <Text style={s.rowTitleAccent}>{r.lead}</Text>
               {r.rest}
             </Text>
-            <Text style={s.rowBody}>{r.body}</Text>
+            <Text style={s.rowBody}>{copyOrText(campusMode, r.body)}</Text>
           </View>
         </View>
       ))}

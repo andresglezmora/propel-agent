@@ -2,6 +2,7 @@ import React from "react";
 import { Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 import { color, space, font } from "../theme";
 import { NumberBadge, IconRing } from "../components";
+import { campusCopy, copyOrText, type CampusMode } from "../campusCopy";
 
 const s = StyleSheet.create({
   page: {
@@ -64,20 +65,20 @@ const s = StyleSheet.create({
 const APPROACH = [
   { n: 1, label: "SOFTWARE", body: "To centralize leads, standardize data, automate follow-up, and provide live data dashboards." },
   { n: 2, label: "PEOPLE", body: "Dedicated outreach specialists, bilingual communicators, designers, and strategists — who extend the school's central team." },
-  { n: 3, label: "PROCESSES", body: "That eliminate cracks in the system: automated workflows, retention campaigns, and cross-campus reporting that ensure no inquiry or student is overlooked." },
+  { n: 3, label: "PROCESSES", body: "partner.processes" },
 ] as const;
 
 const DELIVERS = [
   { icon: "laptop", title: "A unified CRM", body: "That integrates with existing SIS platforms (PowerSchool, Infinite Campus, ProgressBook, etc.)." },
-  { icon: "chart-bar", title: "Dashboards", body: "For benchmarking, network-wide and per school." },
+  { icon: "chart-bar", title: "Dashboards", body: "partner.dashboards" },
   { icon: "lightning", title: "Automated lead generation", body: "SMS/email campaigns and task management to ensure timely follow-up." },
   { icon: "megaphone", title: "Social media advertising", body: "Creation and reporting managed at scale." },
   { icon: "graduation-cap", title: "Professional development", body: "Training so school staff can confidently use the tools." },
   { icon: "shield-check", title: "Compliance", body: "With HIPAA/FERPA standards for secure data handling." },
-  { icon: "chart-line-up", title: "Scalability", body: "To expand as the school network continues to grow." },
+  { icon: "chart-line-up", title: "Scalability", body: "partner.scalability" },
 ] as const;
 
-export function PartnerPage({ schoolName, campusMode = "network" }: { schoolName: string; campusMode?: "single" | "network" }) {
+export function PartnerPage({ schoolName, campusMode = "network" }: { schoolName: string; campusMode?: CampusMode }) {
   return (
     <Page size="LETTER" style={s.page}>
       <Text style={s.h1}>
@@ -90,7 +91,7 @@ export function PartnerPage({ schoolName, campusMode = "network" }: { schoolName
           <NumberBadge n={row.n} />
           <View style={{ flex: 1 }}>
             <Text style={s.approachLabel}>{row.label}</Text>
-            <Text style={s.approachBody}>{row.body}</Text>
+            <Text style={s.approachBody}>{copyOrText(campusMode, row.body)}</Text>
           </View>
         </View>
       ))}
@@ -102,7 +103,7 @@ export function PartnerPage({ schoolName, campusMode = "network" }: { schoolName
             <IconRing icon={d.icon as any} size={30} />
             <View style={{ flex: 1 }}>
               <Text style={s.cardTitle}>{d.title}</Text>
-              <Text style={s.cardBody}>{d.body}</Text>
+              <Text style={s.cardBody}>{copyOrText(campusMode, d.body)}</Text>
             </View>
           </View>
         ))}
@@ -111,11 +112,10 @@ export function PartnerPage({ schoolName, campusMode = "network" }: { schoolName
       <View style={s.bottomLine}>
         <Text style={s.bottomLineLabel}>BOTTOM LINE</Text>
         <Text style={s.bottomLineBody}>
-          This is not a "tool" or a "dashboard" — it is an Enrollment & Operations Command Center
-          that unifies the district's enrollment, marketing, and support services into one
-          transparent, accountable system. By centralizing insights and execution, {schoolName}{" "}
+          {`This is not a "tool" or a "dashboard" — it is an Enrollment & Operations Command Center ${campusCopy(campusMode, "partner.unifies")} transparent, accountable system. By centralizing insights and execution, `}
+          {schoolName}{" "}
           gains the power to anticipate challenges, allocate resources strategically, and fill
-          classrooms{campusMode === "network" ? " across all campuses" : ""}.
+          classrooms{campusCopy(campusMode, "partner.classroomsEnd")}.
         </Text>
       </View>
     </Page>

@@ -13,6 +13,16 @@ from prdkit import Diagram, build_page  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "PRD.html"
 
+
+def campus_copy_rows():
+    """Lee react/campusCopy.ts para que la tabla del PRD salga del código."""
+    src = (ROOT / "react/campusCopy.ts").read_text()
+    rows = []
+    for m in re.finditer(r'"([a-z]+\.[A-Za-z]+)": \{\s*network:\s*"([^"]*)",\s*single:\s*"([^"]*)",?\s*\}', src):
+        key, net, single = m.groups()
+        rows.append(f"<tr><td><code>{key}</code></td><td>{net}</td><td>{single or '<em>(se quita)</em>'}</td></tr>")
+    return "\n".join(rows)
+
 # ───────────────────────── diagramas ─────────────────────────
 
 def d_overview():
@@ -290,7 +300,7 @@ section("problema", "Problema y objetivo", """
 <div class="callout"><span class="label">Regla central</span><p>El texto de los módulos fijos (pilares, testimonios, precios de planes, contrato) nunca se reescribe. Las hojas de trato aceptan texto del equipo, usan uno por defecto o, si se lo piden, el modelo propone uno, que queda marcado para revisión. Las cifras siempre las da el equipo.</p></div>
 """)
 
-section("cambia", "Qué cambia en cada propuesta", """
+section("cambia", "Qué cambia en cada propuesta", f"""
 <p>Todo el PDF es fijo menos esto:</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Campo</th><th>Dónde aparece</th><th>De dónde sale</th></tr></thead>
@@ -301,9 +311,18 @@ section("cambia", "Qué cambia en cada propuesta", """
 <tr><td>Foto de misión</td><td>Página 2</td><td>Igual.</td></tr>
 <tr><td>Foto de Centralized Enrollment</td><td>Página 4</td><td>Igual.</td></tr>
 <tr><td>Hojas de trato y páginas a la medida</td><td>Donde las ponga el plan</td><td>Cifras del equipo; texto del equipo, por defecto o propuesto por el modelo (sección 6).</td></tr>
-<tr><td>Campus único</td><td>Portada y página 3</td><td>Se quita "Network-wide" de la portada y " across all campuses" de la página 3.</td></tr>
+<tr><td>Campus único</td><td>Páginas 1, 2, 3, 4, 6, 9, 10 y 11, y el gasto en anuncios del contrato</td><td>Las frases de red se cambian por su versión de campus único (tabla de abajo).</td></tr>
 </tbody></table></div>
-<div class="callout"><span class="label">Pendiente</span><p>Hoy solo se adaptan esas dos frases para un campus único. El resto del PDF habla de red. La lista completa de frases por cambiar falta definirla y aprobarla (sección 17).</p></div>
+<h3>Frases de campus único</h3>
+<p>Todas las frases que cambian entre red y campus único viven en <code>react/campusCopy.ts</code>. Esta tabla se genera de ese archivo. Las variantes de campus único tienen un largo parecido al original y no afirman nada que el original no diga. No cambian a propósito los testimonios (son citas de clientes reales) ni las cláusulas del contrato que ya están en condicional ("For organizations operating multiple campuses…").</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Clave</th><th>Red</th><th>Campus único</th></tr></thead>
+<tbody>
+{campus_copy_rows()}
+<tr><td><code>dashboards pills</code></td><td>Network · District-Level View · School · Per-School Breakdown · Real-Time · Live Data Sync</td><td>School · School-Wide View · Funnel · Stage Breakdown · Real-Time · Live Data Sync</td></tr>
+<tr><td><code>cmo.opening</code></td><td>Every {{escuela}} campus gets a dedicated enrollment strategy</td><td>{{escuela}} gets a dedicated enrollment strategy</td></tr>
+<tr><td><code>cover</code></td><td>Línea "Network-wide" en la portada</td><td><em>(se quita)</em></td></tr>
+</tbody></table></div>
 """)
 
 section("alcance", "Alcance", """
@@ -593,7 +612,7 @@ section("pendientes", "Pendientes por prioridad", """
 <thead><tr><th>#</th><th>Pendiente</th><th>Por qué importa</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Aprobar la redacción del contrato para tratos de red</td><td>Ya está construida (sección 6), pero es texto legal: alguien debe aprobar las 4 frases antes de usarla con un cliente.</td></tr>
-<tr><td>2</td><td>Definir y aprobar las frases de campus único</td><td>Hoy solo cambian 2 frases. El resto del PDF dice red, y el cliente lo ve.</td></tr>
+<tr><td>2</td><td>Aprobar las frases de campus único</td><td>Ya están construidas (sección 3). Falta que el equipo las apruebe antes de desplegarlas.</td></tr>
 <tr><td>3</td><td>Detectar texto encima de las fotos del sitio</td><td>El filtro por nombre de archivo atrapa portadas de blog, pero no un gráfico con nombre normal.</td></tr>
 <tr><td>4</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
 <tr><td>5</td><td>Recetas desde Scale</td><td>La tabla <code>propel.recipes</code> ya existe. Falta la pantalla en Scale para armarlas sin el chat.</td></tr>

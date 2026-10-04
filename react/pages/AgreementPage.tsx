@@ -59,10 +59,20 @@ const s = StyleSheet.create({
   sigLine: { borderTopWidth: 1, borderTopColor: "#26263a", marginTop: 18, paddingTop: 4, fontSize: 8.5, color: color.muted },
 });
 
-export function AgreementPage({ schoolName, possessive, fee }: { schoolName: string; possessive: string; fee?: NetworkFee }) {
-  const sections = buildAgreementSections(schoolName, possessive, fee);
+export function AgreementPage({
+  schoolName,
+  possessive,
+  fee,
+  campusMode = "network",
+}: {
+  schoolName: string;
+  possessive: string;
+  fee?: NetworkFee;
+  campusMode?: "single" | "network";
+}) {
+  const sections = buildAgreementSections(schoolName, possessive, fee, campusMode);
   const EXHIBIT_A = exhibitA(fee);
-  const EXHIBIT_C = exhibitC(fee);
+  const EXHIBIT_C = exhibitC(fee, campusMode);
 
   return (
     <Page size="LETTER" style={s.page} wrap>
