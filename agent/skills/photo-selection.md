@@ -22,8 +22,12 @@ directamente y úsala con `set_slot_photo`.
 
 Usa fotos reales, no piezas gráficas: nada con texto encima, logos, marcos ni
 fondos diseñados (portadas de blog, banners, flyers). `harvest_site_photos` ya
-descarta las que lo dicen en el nombre del archivo, pero si una candidata tiene
-nombre de gráfico o de evento promocional, descártala tú también.
+pasa cada candidata por un modelo con visión que descarta gráficos, logos,
+capturas, ilustraciones y fotos con texto encima; `rejected` dice cuáles y por
+qué. Cada candidata trae una `description` de lo que se ve: úsala para elegir
+qué foto va en cada espacio. Si la revisión visual falló (`screening:
+"filename"`), solo se filtró por el nombre del archivo: sé más desconfiado con
+las candidatas.
 
 ## Una foto, un espacio
 

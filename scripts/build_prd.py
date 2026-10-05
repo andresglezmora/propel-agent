@@ -65,14 +65,18 @@ def d_flow():
 
 
 def d_photos():
-    d = Diagram("photos", "Diagrama 3. Cómo se decide la foto de cada espacio (portada, misión y Centralized Enrollment).", 700)
-    d.node("cand", 0, 400, 340, "Entrada", "Candidatas del sitio", "harvest_site_photos las ordena de mayor a menor resolución.")
-    d.node("min", 1, 400, 380, "Decisión", "¿Alguna cumple el mínimo del espacio?", "Portada: 1200 px de lado largo. Misión y Centralized: 800 px.")
-    d.node("use", 2, 170, 270, "Tool", "set_slot_photo", "Usa la foto del sitio. Para la portada se prefiere alumnos en actividad real, horizontal y sin texto encima.")
-    d.node("cap", 2, 600, 270, "Decisión", "¿Ya van 6 imágenes con IA en esta propuesta?")
-    d.node("gen", 3, 470, 250, "Tool", "generate_ai_photo", "Foto realista, sin nadie reconocible en primer plano, sin texto ni logos.")
-    d.node("ask", 3, 705, 170, "Persona", "Foto del equipo", "Se pide y se usa con set_slot_photo.")
-    d.edge("cand", "bottom", "min", "top")
+    d = Diagram("photos", "Diagrama 0. Cómo se decide la foto de cada espacio (portada, misión y Centralized Enrollment).", 700)
+    d.node("cand", 0, 400, 340, "Entrada", "Candidatas del sitio", "Firecrawl lee la home y /about. Se quedan las de 600 px o más.")
+    d.node("vis", 1, 400, 380, "Decisión", "¿Es una foto real, sin texto encima?", "Lo revisa un modelo chico con visión y describe cada foto.")
+    d.node("out", 1, 700, 170, "Error", "Se descarta", "Gráfico, logo, captura o texto encima.", "dashed")
+    d.node("min", 2, 400, 380, "Decisión", "¿Alguna cumple el mínimo del espacio?", "Portada: 1200 px de lado largo. Misión y Centralized: 800 px.")
+    d.node("use", 3, 170, 270, "Tool", "set_slot_photo", "Usa la foto del sitio, elegida por su descripción. Una foto distinta por espacio.")
+    d.node("cap", 3, 600, 270, "Decisión", "¿Ya van 6 imágenes con IA en esta propuesta?")
+    d.node("gen", 4, 470, 250, "Tool", "generate_ai_photo", "Foto realista, sin nadie reconocible en primer plano, sin texto ni logos.")
+    d.node("ask", 4, 705, 170, "Persona", "Foto del equipo", "Se pide y se usa con set_slot_photo.")
+    d.edge("cand", "bottom", "vis", "top")
+    d.edge("vis", "right", "out", "left", "no")
+    d.edge("vis", "bottom", "min", "top", "sí")
     d.edge("min", "bottom", "use", "top", "sí")
     d.edge("min", "bottom", "cap", "top", "no")
     d.edge("cap", "bottom", "gen", "top", "no")
@@ -416,7 +420,7 @@ section("fotos", "Fotos", f"""
 <li>Máximo 6 generaciones por propuesta, contando las regeneraciones. Al llegar al tope, la tool devuelve un error a propósito y el agente pide una foto al equipo.</li>
 <li>No se usan fotos de stock. Una foto de stock con menores presentada como alumnos de la escuela es un riesgo que no se corre.</li>
 </ul>
-<p>Una misma foto no puede ir en dos espacios: <code>set_slot_photo</code> lo rechaza. La búsqueda descarta gráficos con texto encima cuando el nombre del archivo lo indica (portadas de blog, banners, flyers). Antes de entrar al PDF, cada foto se reduce al tamaño que ocupa (1600 px la portada, 1200 las demás) y se pasa a JPEG.</p>
+<p>Una misma foto no puede ir en dos espacios: <code>set_slot_photo</code> lo rechaza. Cada candidata pasa por un modelo chico con visión (<code>google/gemini-3.1-flash-lite</code>) que descarta gráficos, logos, capturas, ilustraciones y fotos con texto encima, y describe lo que se ve para elegir qué va en cada espacio. Si el modelo falla, la búsqueda sigue con un filtro por el nombre del archivo. En las pruebas, la revisión visual acertó donde el nombre engañaba: aceptó fotos limpias llamadas "Blog-Cover" y descartó banners con nombres normales. Antes de entrar al PDF, cada foto se reduce al tamaño que ocupa (1600 px la portada, 1200 las demás) y se pasa a JPEG.</p>
 <p>El filtro de la tool de búsqueda es de 600 px. Los mínimos de 1200 y 800 los aplica el agente siguiendo la skill <code>photo-selection</code>.</p>
 """)
 
@@ -435,7 +439,7 @@ section("arquitectura", "Arquitectura", f"""
 <thead><tr><th>Pieza</th><th>Para qué</th><th>Configuración</th></tr></thead>
 <tbody>
 <tr><td>Vercel</td><td>Corre el agente. Proyecto <code>propel-agent</code>, equipo <code>mora-os</code>.</td><td>Variables de entorno del proyecto</td></tr>
-<tr><td>AI Gateway</td><td>Modelo del agente (<code>openai/gpt-5.6-terra</code>) e imágenes (<code>openai/gpt-image-2</code>).</td><td><code>AI_GATEWAY_API_KEY</code></td></tr>
+<tr><td>AI Gateway</td><td>Modelo del agente (<code>openai/gpt-5.6-terra</code>), imágenes (<code>openai/gpt-image-2</code>) y revisión visual de fotos (<code>google/gemini-3.1-flash-lite</code>).</td><td><code>AI_GATEWAY_API_KEY</code></td></tr>
 <tr><td>Firecrawl</td><td>Lee la home y /about del sitio y devuelve las URLs de imágenes.</td><td><code>FIRECRAWL_API_KEY</code></td></tr>
 <tr><td>Supabase</td><td>Base de datos (schema <code>propel</code>) y Storage (bucket privado <code>propel-proposals</code>).</td><td><code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code></td></tr>
 <tr><td>react-pdf</td><td>Genera el PDF en memoria dentro de la función. No hay navegador.</td><td>Sin servicio externo</td></tr>
@@ -567,6 +571,7 @@ section("decisiones", "Decisiones y por qué", """
 <tr><td>Hilos de conversación en vez de tarjetas Kanban</td><td>Se pide, se revisa y se corrige hablando, y varias personas pueden participar.</td></tr>
 <tr><td>Plantilla en módulos y recetas</td><td>Las variantes (red, campus único, hojas extra de un trato) se arman como listas de módulos, sin duplicar páginas.</td></tr>
 <tr><td>El contrato toma el precio de la opción recomendada</td><td>Si la hoja de red y el contrato tienen precios distintos, el PDF se contradice. La opción recomendada es la que se firma.</td></tr>
+<tr><td>Revisión visual de las fotos del sitio</td><td>El nombre del archivo engaña en los dos sentidos. Un modelo chico ve la imagen y cuesta alrededor de una décima de centavo por propuesta.</td></tr>
 <tr><td>Las cifras son datos y los totales se calculan en código</td><td>Los precios de red son de cada trato y no hay tabla de descuentos. El modelo no multiplica ni inventa números.</td></tr>
 <tr><td>El modelo puede proponer texto, marcado como suyo</td><td>Casi siempre el equipo da el texto. Cuando no, el modelo propone dentro de límites, y la vista previa avisa qué texto es suyo para que se revise antes de aprobar.</td></tr>
 <tr><td>Páginas a la medida con bloques fijos</td><td>Flexibilidad sin diseño improvisado: la página se describe como datos y el renderer garantiza el estilo.</td></tr>
@@ -611,16 +616,13 @@ section("pendientes", "Pendientes por prioridad", """
 <div class="table-wrap"><table>
 <thead><tr><th>#</th><th>Pendiente</th><th>Por qué importa</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>Aprobar la redacción del contrato para tratos de red</td><td>Ya está construida (sección 6), pero es texto legal: alguien debe aprobar las 4 frases antes de usarla con un cliente.</td></tr>
-<tr><td>2</td><td>Aprobar las frases de campus único</td><td>Ya están construidas (sección 3). Falta que el equipo las apruebe antes de desplegarlas.</td></tr>
-<tr><td>3</td><td>Detectar texto encima de las fotos del sitio</td><td>El filtro por nombre de archivo atrapa portadas de blog, pero no un gráfico con nombre normal.</td></tr>
-<tr><td>4</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
-<tr><td>5</td><td>Recetas desde Scale</td><td>La tabla <code>propel.recipes</code> ya existe. Falta la pantalla en Scale para armarlas sin el chat.</td></tr>
-<tr><td>6</td><td>Probar nombres difíciles</td><td>Posesivos como St. Mary's, nombres terminados en s y nombres muy largos en la portada.</td></tr>
-<tr><td>7</td><td>Medir el costo por propuesta</td><td>Hoy no se puede saber cuánto cuesta cada una.</td></tr>
-<tr><td>8</td><td>Evals para elegir el modelo</td><td>Hay un fixture de PROUD Academy en <code>evals/fixtures</code>. Ahora también conviene uno de red con página a la medida.</td></tr>
-<tr><td>9</td><td>Agregar el grupo de Telegram del equipo</td><td>Basta con sumar su <code>chat.id</code> a la lista permitida.</td></tr>
-<tr><td>10</td><td>Decidir si la aprobación en Scale puede ser de un solo mensaje</td><td>Hoy son dos: "aprobado" y approve.</td></tr>
+<tr><td>1</td><td>Probar el caso pesado en Vercel: 6 imágenes con IA</td><td>Puede pasar el límite de tiempo de la función.</td></tr>
+<tr><td>2</td><td>Recetas desde Scale</td><td>La tabla <code>propel.recipes</code> ya existe. Falta la pantalla en Scale para armarlas sin el chat.</td></tr>
+<tr><td>3</td><td>Probar nombres difíciles</td><td>Posesivos como St. Mary's, nombres terminados en s y nombres muy largos en la portada.</td></tr>
+<tr><td>4</td><td>Medir el costo por propuesta</td><td>Hoy no se puede saber cuánto cuesta cada una.</td></tr>
+<tr><td>5</td><td>Evals para elegir el modelo</td><td>Hay un fixture de PROUD Academy en <code>evals/fixtures</code>. Ahora también conviene uno de red con página a la medida.</td></tr>
+<tr><td>6</td><td>Agregar el grupo de Telegram del equipo</td><td>Basta con sumar su <code>chat.id</code> a la lista permitida.</td></tr>
+<tr><td>7</td><td>Decidir si la aprobación en Scale puede ser de un solo mensaje</td><td>Hoy son dos: "aprobado" y approve.</td></tr>
 </tbody></table></div>
 """)
 

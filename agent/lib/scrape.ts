@@ -1,5 +1,6 @@
 import { Firecrawl } from "firecrawl";
 import { imageSize } from "image-size";
+import { screenImages, verdict } from "./vision";
 
 /**
  * Nivel 0 de la escalera de imágenes (PRD sección 7): busca las fotos
@@ -23,11 +24,19 @@ export type SiteImageCandidate = {
   url: string;
   width: number;
   height: number;
+  /** De la revisión visual: qué se ve y si hay personas. */
+  description?: string;
+  people?: boolean;
 };
 
+export type RejectedImage = { url: string; reason: string };
+
+type Probed = SiteImageCandidate & { bytes: Buffer };
+
 const DECORATIVE_HINTS = /logo|icon|favicon|sprite|avatar|badge|button|arrow|bullet|spinner|placeholder|social|facebook|twitter|instagram/i;
-// Gráficos con texto encima (portadas de blog, banners, flyers): pasan el
-// filtro de tamaño pero no sirven como foto de la propuesta.
+// Gráficos con texto encima (portadas de blog, banners, flyers) por el nombre
+// del archivo. Solo se usa de respaldo cuando la revisión visual falla: el
+// nombre engaña en los dos sentidos (hay "Blog-Cover" que son fotos limpias).
 const GRAPHIC_HINTS = /blog[-_ ]?cover|banner|flyer|poster|infographic|graphic|header[-_ ]?image|social[-_ ]?card|og[-_ ]?image|thumbnail/i;
 
 let client: Firecrawl | null = null;
@@ -51,7 +60,7 @@ async function imagesFromPage(url: string): Promise<string[]> {
   }
 }
 
-async function probeImage(url: string): Promise<SiteImageCandidate | null> {
+async function probeImage(url: string): Promise<Probed | null> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return null;
@@ -59,7 +68,7 @@ async function probeImage(url: string): Promise<SiteImageCandidate | null> {
     if (buf.byteLength < 2000) return null; // casi seguro un ícono
     const dims = imageSize(buf);
     if (!dims.width || !dims.height) return null;
-    return { url, width: dims.width, height: dims.height };
+    return { url, width: dims.width, height: dims.height, bytes: buf };
   } catch {
     return null;
   }
@@ -68,7 +77,12 @@ async function probeImage(url: string): Promise<SiteImageCandidate | null> {
 export async function harvestSitePhotos(
   websiteUrl: string,
   opts: { minLongSide?: number; maxCandidates?: number } = {},
-): Promise<{ candidates: SiteImageCandidate[]; error?: string }> {
+): Promise<{
+  candidates: SiteImageCandidate[];
+  rejected?: RejectedImage[];
+  screening?: "vision" | "filename";
+  error?: string;
+}> {
   const minLongSide = opts.minLongSide ?? 600;
   const maxCandidates = opts.maxCandidates ?? 12;
 
@@ -85,7 +99,7 @@ export async function harvestSitePhotos(
 
   const pages = [base.toString(), new URL("/about", base).toString()];
   const perPage = await Promise.all(pages.map(imagesFromPage));
-  const all = [...new Set(perPage.flat())].filter((u) => /^https?:\/\//i.test(u) && !DECORATIVE_HINTS.test(u) && !GRAPHIC_HINTS.test(u));
+  const all = [...new Set(perPage.flat())].filter((u) => /^https?:\/\//i.test(u) && !DECORATIVE_HINTS.test(u));
 
   if (all.length === 0) {
     return {
@@ -95,11 +109,29 @@ export async function harvestSitePhotos(
   }
 
   const probed = await Promise.all(all.slice(0, 40).map(probeImage));
-  const candidates = probed
-    .filter((c): c is SiteImageCandidate => c !== null)
+  // Las más grandes primero; se revisan hasta 20 para que, después de
+  // descartar gráficos, sigan quedando opciones.
+  const pool = probed
+    .filter((c): c is Probed => c !== null)
     .filter((c) => Math.max(c.width, c.height) >= minLongSide)
     .sort((a, b) => b.width * b.height - a.width * a.height)
-    .slice(0, maxCandidates);
+    .slice(0, 20);
 
-  return { candidates };
+  const strip = ({ bytes: _bytes, ...rest }: Probed): SiteImageCandidate => rest;
+  const screens = await screenImages(pool.map((c) => c.bytes));
+
+  if (!screens) {
+    const rejected = pool.filter((c) => GRAPHIC_HINTS.test(c.url)).map((c) => ({ url: c.url, reason: "el nombre del archivo indica un gráfico" }));
+    const candidates = pool.filter((c) => !GRAPHIC_HINTS.test(c.url)).slice(0, maxCandidates).map(strip);
+    return { candidates, rejected, screening: "filename" };
+  }
+
+  const candidates: SiteImageCandidate[] = [];
+  const rejected: RejectedImage[] = [];
+  pool.forEach((c, i) => {
+    const v = verdict(screens[i]!);
+    if (v.ok) candidates.push({ ...strip(c), description: screens[i]!.description, people: screens[i]!.people });
+    else rejected.push({ url: c.url, reason: v.reason });
+  });
+  return { candidates: candidates.slice(0, maxCandidates), rejected, screening: "vision" };
 }
